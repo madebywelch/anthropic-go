@@ -29,7 +29,7 @@ func main() {
 		panic(err)
 	}
 
-	response, err := client.Complete(&CompletionRequest{
+	response, err := client.Complete(&anthropic.CompletionRequest{
 		Prompt:            "Human: Hello, how are you?",
 		Model:             anthropic.ClaudeV1,
 		MaxTokensToSample: 100,
@@ -53,7 +53,6 @@ This unofficial Anthropic API client SDK supports automatic retries for requests
 ```go
 client, err := anthropic.NewClient(
 	apiKey,
-	clientID,
 	anthropic.WithMaxRetries(5),               // Retry up to 5 times
 	anthropic.WithRetryDelay(3 * time.Second), // 3-second delay between retries
 )
