@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	client, err := NewClient(apiKey)
+	client, err := anthropic.NewClient(apiKey)
 
 	if err != nil {
 		panic(err)
@@ -31,7 +31,7 @@ func main() {
 
 	response, err := client.Complete(&CompletionRequest{
 		Prompt:            "Human: Hello, how are you?",
-		Model:             ClaudeV1,
+		Model:             anthropic.ClaudeV1,
 		MaxTokensToSample: 100,
 		StopSequences:     []string{"\r", "Human:"},
 	})
