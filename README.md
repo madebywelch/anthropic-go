@@ -14,13 +14,12 @@ go get github.com/madebywelch/anthropic-go
 
 ## Usage
 
-To use the Anthropic SDK, you'll need to initialize a client and make requests to the Anthropic API. Here's an example of initializing a client and performing a search:
+To use the Anthropic SDK, you'll need to initialize a client and make requests to the Anthropic API. Here's an example of initializing a client and performing a regular and a streaming completion:
+
+## Completion Example
 
 ```go
-import (
-    "github.com/madebywelch/anthropic-go/pkg/anthropic"
-    "fmt"
-)
+import "github.com/madebywelch/anthropic-go/pkg/anthropic"
 
 func main() {
 	client, err := anthropic.NewClient(apiKey)
@@ -29,19 +28,55 @@ func main() {
 		panic(err)
 	}
 
-	response, err := client.Complete(&anthropic.CompletionRequest{
+	response, _ := client.Complete(&anthropic.CompletionRequest{
 		Prompt:            "Human: Hello, how are you?",
 		Model:             anthropic.ClaudeV1,
 		MaxTokensToSample: 100,
 		StopSequences:     []string{"\r", "Human:"},
-	})
+	}, nil)
 
-    if err != nil {
-        panic(err)
-    }
-
-    fmt.Printf("claude says: %v\n", response.Completion)
+	fmt.Printf("Completion: %s\n", response.Completion)
 }
+```
+
+### Completion Example Output
+
+```
+The sky appears blue to us due to the way the atmosphere scatters light from the sun
+```
+
+## Streaming Example
+
+```go
+import "github.com/madebywelch/anthropic-go/pkg/anthropic"
+
+func main() {
+	client, err := NewClient(apiKey)
+	if err != nil {
+		log.Fatalf("Error creating client: %v", err)
+	}
+
+	_, err := client.Complete(&CompletionRequest{
+		Prompt:            "Human: Why is the sky blue?",
+		Model:             ClaudeV1,
+		MaxTokensToSample: 25,
+		Stream:            true,
+	}, func(response *CompletionResponse) error {
+		fmt.Printf("Completion: %s\n", response.Completion)
+		return nil
+	})
+}
+```
+
+### Streaming Example Output
+
+```
+The sky appears blue to
+The sky appears blue to us due to how
+The sky appears blue to us due to how the
+The sky appears blue to us due to how the atmosphere
+The sky appears blue to us due to how the atmosphere scatters light from
+The sky appears blue to us due to how the atmosphere scatters light from the sun
 ```
 
 ## Automatic Retries
