@@ -2,6 +2,7 @@ package anthropic
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -21,10 +22,26 @@ func TestComplete(t *testing.T) {
 				Prompt:            GetPrompt("Why is the sky blue?"),
 				Model:             ClaudeV1,
 				MaxTokensToSample: 10,
+				Stream:            false,
 			},
 			expectedStatus: http.StatusOK,
 			expectedOutput: &CompletionResponse{
 				Completion: "The sky appears blue",
+				StopReason: "stop_sequence",
+				Stop:       "\n\nHuman:",
+			},
+		},
+		{
+			name: "valid streaming completion request",
+			request: &CompletionRequest{
+				Prompt:            GetPrompt("What is the meaning of life?"),
+				Model:             ClaudeV1,
+				MaxTokensToSample: 10,
+				Stream:            true,
+			},
+			expectedStatus: http.StatusOK,
+			expectedOutput: &CompletionResponse{
+				Completion: "The meaning of life is",
 				StopReason: "stop_sequence",
 				Stop:       "\n\nHuman:",
 			},
@@ -53,13 +70,19 @@ func TestComplete(t *testing.T) {
 					http.Error(w, err.Error(), http.StatusBadRequest)
 					return
 				}
-				if !strings.Contains(req.Prompt, "Why is the sky blue?") {
+				if !strings.Contains(req.Prompt, tc.request.Prompt) {
 					http.Error(w, "invalid prompt", http.StatusBadRequest)
 					return
 				}
 
-				w.WriteHeader(tc.expectedStatus)
-				json.NewEncoder(w).Encode(tc.expectedOutput)
+				if req.Stream {
+					w.Header().Set("Content-Type", "text/event-stream")
+					data, _ := json.Marshal(tc.expectedOutput)
+					fmt.Fprintf(w, "data: %s\n\n", data)
+				} else {
+					w.WriteHeader(tc.expectedStatus)
+					json.NewEncoder(w).Encode(tc.expectedOutput)
+				}
 			}))
 			defer server.Close()
 
@@ -69,22 +92,23 @@ func TestComplete(t *testing.T) {
 			}
 			client.baseURL = server.URL
 
-			resp, err := client.Complete(tc.request)
+			_, err = client.Complete(tc.request, func(resp *CompletionResponse) error {
+				if resp == nil {
+					t.Fatalf("response is nil")
+				}
+				if resp.Completion != tc.expectedOutput.Completion {
+					t.Errorf("invalid completion: %s", resp.Completion)
+				}
+				if resp.StopReason != tc.expectedOutput.StopReason {
+					t.Errorf("invalid stop reason: %s", resp.StopReason)
+				}
+				if resp.Stop != tc.expectedOutput.Stop {
+					t.Errorf("invalid stop sequence: %s", resp.Stop)
+				}
+				return nil
+			})
 			if err != nil {
 				t.Fatalf("failed to send request: %v", err)
-			}
-
-			if resp == nil {
-				t.Fatalf("response is nil")
-			}
-			if resp.Completion != "The sky appears blue" {
-				t.Errorf("invalid completion: %s", resp.Completion)
-			}
-			if resp.StopReason != "stop_sequence" {
-				t.Errorf("invalid stop reason: %s", resp.StopReason)
-			}
-			if resp.Stop != "\n\nHuman:" {
-				t.Errorf("invalid stop sequence: %s", resp.Stop)
 			}
 		})
 	}

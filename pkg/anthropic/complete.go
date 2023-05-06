@@ -1,9 +1,11 @@
 package anthropic
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -27,8 +29,24 @@ type CompletionResponse struct {
 	Stop       string `json:"stop"`
 }
 
-// Complete sends a completion request to the Anthropic API and returns the response.
-func (c *Client) Complete(req *CompletionRequest) (*CompletionResponse, error) {
+// StreamCallback is a function that handles a stream of completions.
+type StreamCallback func(*CompletionResponse) error
+
+// Complete sends a completion request to the API and returns a single completion or a stream of completions.
+func (c *Client) Complete(req *CompletionRequest, callback StreamCallback) (*CompletionResponse, error) {
+	if !req.Stream {
+		response, err := c.sendCompletionRequest(req)
+		if err != nil {
+			return nil, err
+		}
+		return response, nil
+	}
+
+	return c.sendCompletionRequestStream(req, callback)
+}
+
+// sendCompletionRequest sends a completion request to the API and returns a single completion.
+func (c *Client) sendCompletionRequest(req *CompletionRequest) (*CompletionResponse, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling completion request: %w", err)
@@ -55,6 +73,73 @@ func (c *Client) Complete(req *CompletionRequest) (*CompletionResponse, error) {
 	}
 
 	return &completionResponse, nil
+}
+
+// sendCompletionRequestStream sends a completion request to the API and returns a stream of completions.
+func (c *Client) sendCompletionRequestStream(req *CompletionRequest, callback StreamCallback) (*CompletionResponse, error) {
+	data, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("error marshalling completion request: %w", err)
+	}
+
+	request, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/complete", c.baseURL), bytes.NewBuffer(data))
+	if err != nil {
+		return nil, fmt.Errorf("error creating new request: %w", err)
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Api-Key", c.apiKey)
+	request.Header.Set("Accept", "text/event-stream")
+
+	response, err := c.doRequest(request)
+	if err != nil {
+		return nil, fmt.Errorf("error sending completion request: %w", err)
+	}
+	defer response.Body.Close()
+
+	return c.processSseStream(response.Body, callback)
+}
+
+// processSseStream reads the SSE stream from the API and calls the callback for each completion.
+func (c *Client) processSseStream(reader io.Reader, callback StreamCallback) (*CompletionResponse, error) {
+	scanner := bufio.NewScanner(reader)
+	var dataBuffer bytes.Buffer
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.HasPrefix(line, ":") {
+			continue
+		}
+
+		if line == "data: [DONE]" {
+			break
+		}
+
+		if strings.HasPrefix(line, "data:") {
+			data := strings.TrimSpace(line[5:])
+			dataBuffer.WriteString(data)
+		} else if line == "" {
+			if dataBuffer.Len() > 0 {
+				var completionResponse CompletionResponse
+				err := json.Unmarshal(dataBuffer.Bytes(), &completionResponse)
+				dataBuffer.Reset()
+
+				if err != nil {
+					return nil, fmt.Errorf("error decoding completion response: %w", err)
+				}
+				if err := callback(&completionResponse); err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("error reading from stream: %w", err)
+	}
+
+	return nil, nil
 }
 
 // GetPrompt returns a prompt string that can be used to complete a user question.
