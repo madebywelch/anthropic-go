@@ -29,7 +29,7 @@ func main() {
 	}
 
 	response, _ := client.Complete(&anthropic.CompletionRequest{
-		Prompt:            "Human: Hello, how are you?",
+		Prompt:            "Human: Why is the sky blue?",
 		Model:             anthropic.ClaudeV1,
 		MaxTokensToSample: 100,
 		StopSequences:     []string{"\r", "Human:"},
