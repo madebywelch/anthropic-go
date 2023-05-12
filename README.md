@@ -51,7 +51,7 @@ The sky appears blue to us due to the way the atmosphere scatters light from the
 import "github.com/madebywelch/anthropic-go/pkg/anthropic"
 
 func main() {
-	client, err := NewClient(apiKey)
+	client, err := anthropic.NewClient(apiKey)
 	if err != nil {
 		log.Fatalf("Error creating client: %v", err)
 	}
@@ -63,6 +63,7 @@ func main() {
 		Stream:            true,
 	}, func(response *CompletionResponse) error {
 		fmt.Printf("Completion: %s\n", response.Completion)
+		fmt.Printf("Delta: %s\n", response.Delta) // diff
 		return nil
 	})
 }
