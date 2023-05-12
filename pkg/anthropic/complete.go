@@ -25,6 +25,7 @@ type CompletionRequest struct {
 // CompletionResponse is the response from the Anthropic API for a completion request.
 type CompletionResponse struct {
 	Completion string `json:"completion"`
+	Delta      string `json:"delta,omitempty"`
 	StopReason string `json:"stop_reason"`
 	Stop       string `json:"stop"`
 }
@@ -104,6 +105,7 @@ func (c *Client) sendCompletionRequestStream(req *CompletionRequest, callback St
 func (c *Client) processSseStream(reader io.Reader, callback StreamCallback) (*CompletionResponse, error) {
 	scanner := bufio.NewScanner(reader)
 	var dataBuffer bytes.Buffer
+	var prev string
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -124,6 +126,20 @@ func (c *Client) processSseStream(reader io.Reader, callback StreamCallback) (*C
 				var completionResponse CompletionResponse
 				err := json.Unmarshal(dataBuffer.Bytes(), &completionResponse)
 				dataBuffer.Reset()
+
+				if prev != "" {
+					arr := strings.SplitAfter(completionResponse.Completion, prev)
+
+					if len(arr) > 1 {
+						completionResponse.Delta = arr[1]
+					} else {
+						return nil, fmt.Errorf("could not compute delta")
+					}
+				} else {
+					completionResponse.Delta = completionResponse.Completion
+				}
+
+				prev = completionResponse.Completion
 
 				if err != nil {
 					return nil, fmt.Errorf("error decoding completion response: %w", err)
