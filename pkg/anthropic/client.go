@@ -1,8 +1,6 @@
 package anthropic
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -36,7 +34,7 @@ func WithRetryDelay(retryDelay time.Duration) ClientOptions {
 // NewClient initializes a new Anthropic API client with the required headers.
 func NewClient(apiKey string, options ...ClientOptions) (*Client, error) {
 	if apiKey == "" {
-		return nil, errors.New("apiKey is required")
+		return nil, ErrAnthropicApiKeyRequired
 	}
 
 	client := &Client{
@@ -77,7 +75,7 @@ func (c *Client) doRequest(request *http.Request) (*http.Response, error) {
 			if response.StatusCode == http.StatusOK {
 				break
 			} else {
-				err = fmt.Errorf("unexpected status code: %d", response.StatusCode)
+				err = mapHTTPStatusCodeToError(response.StatusCode)
 			}
 		}
 
