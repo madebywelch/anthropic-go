@@ -56,12 +56,12 @@ func main() {
 		log.Fatalf("Error creating client: %v", err)
 	}
 
-	_, err := client.Complete(&CompletionRequest{
+	_, err := client.Complete(&anthropic.CompletionRequest{
 		Prompt:            "Human: Why is the sky blue?",
 		Model:             ClaudeV1,
 		MaxTokensToSample: 25,
 		Stream:            true,
-	}, func(response *CompletionResponse) error {
+	}, func(response *anthropic.CompletionResponse) error {
 		fmt.Printf("Completion: %s\n", response.Completion)
 		fmt.Printf("Delta: %s\n", response.Delta) // diff
 		return nil
@@ -87,7 +87,7 @@ This unofficial Anthropic API client SDK supports automatic retries for requests
 **Example:**
 
 ```go
-client, err := anthropic.NewClient(
+_, _ := anthropic.NewClient(
 	apiKey,
 	anthropic.WithMaxRetries(5),               // Retry up to 5 times
 	anthropic.WithRetryDelay(3 * time.Second), // 3-second delay between retries
