@@ -1,30 +1,46 @@
 package anthropic
 
-// Model represents the model to use for the completion request.
+// Model represents a Claude model.
 type Model string
 
 const (
 	// Our largest model, ideal for a wide range of more complex tasks.
-	// Using this model name will automatically switch you to newer versions
-	// of claude-v1 after a period of early access evaluation. It currently points at claude-v1.0.
 	ClaudeV1 Model = "claude-v1"
-	// Current default for claude-v1.
-	ClaudeV1_0 Model = "claude-v1.0"
-	// [Early access for evaluation] An improved version of claude-v1.
-	// It is slightly improved at general helpfulness, instruction following, c
-	// oding, and other tasks. It is also considerably better with non-English languages.
-	// This model also has the ability to role play (in harmless ways) more consistently,
-	// and it defaults to writing somewhat longer and more thorough responses.
-	ClaudeV1_2 Model = "claude-v1.2"
+
+	// An enhanced version of ClaudeV1 with a 100,000 token context window.
+	ClaudeV1_100k Model = "claude-v1-100k"
+
 	// A smaller model with far lower latency, sampling at roughly 40 words/sec!
-	// Its output quality is somewhat lower than claude-v1 models, particularly for
-	// complex tasks. However, it is much less expensive and blazing fast. We believe
-	// that this model provides more than adequate performance on a range of tasks
-	// including text classification, summarization, and lightweight chat applications,
-	// as well as search result summarization. Using this model name will automatically
-	// switch you to newer versions of claude-instant-v1 after a period of early access evaluation.
-	// It currently points at claude-instant-v1.0.
 	ClaudeInstantV1 Model = "claude-instant-v1"
-	// Current default for claude-instant-v1.
+
+	// An enhanced version of ClaudeInstantV1 with a 100,000 token context window.
+	ClaudeInstantV1_100k Model = "claude-instant-v1-100k"
+
+	// Specific sub-versions of the models:
+
+	// More robust against red-team inputs, better at precise instruction-following,
+	// better at code, and better and non-English dialogue and writing.
+	ClaudeV1_3 Model = "claude-v1.3"
+
+	// An enhanced version of ClaudeV1_3 with a 100,000 token context window.
+	ClaudeV1_3_100k Model = "claude-v1.3-100k"
+
+	// An improved version of ClaudeV1, slightly improved at general helpfulness,
+	// instruction following, coding, and other tasks. It is also considerably
+	// better with non-English languages.
+	ClaudeV1_2 Model = "claude-v1.2"
+
+	// An earlier version of ClaudeV1.
+	ClaudeV1_0 Model = "claude-v1.0"
+
+	// Latest version of ClaudeInstantV1. It is better at a wide variety of tasks
+	// including writing, coding, and instruction following. It performs better on
+	// academic benchmarks, including math, reading comprehension, and coding tests.
+	ClaudeInstantV1_1 Model = "claude-instant-v1.1"
+
+	// An enhanced version of ClaudeInstantV1_1 with a 100,000 token context window.
+	ClaudeInstantV1_1_100k Model = "claude-instant-v1.1-100k"
+
+	// An earlier version of ClaudeInstantV1.
 	ClaudeInstantV1_0 Model = "claude-instant-v1.0"
 )
