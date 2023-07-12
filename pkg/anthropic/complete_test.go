@@ -86,7 +86,7 @@ func TestComplete(t *testing.T) {
 			}))
 			defer server.Close()
 
-			client, err := NewClient("test-api-key", WithMaxRetries(1), WithRetryDelay(10))
+			client, err := NewClient("test-api-key")
 			if err != nil {
 				t.Fatalf("failed to create client: %v", err)
 			}

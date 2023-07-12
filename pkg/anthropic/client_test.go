@@ -8,19 +8,13 @@ import (
 
 func TestNewClient(t *testing.T) {
 	apiKey := "test-api-key"
-	client, err := NewClient(apiKey, WithMaxRetries(3), WithRetryDelay(10))
+	client, err := NewClient(apiKey)
 	if err != nil {
 		t.Fatalf("failed to create client: %v", err)
 	}
 
 	if client.apiKey != apiKey {
 		t.Errorf("expected apiKey %q, but got %q", apiKey, client.apiKey)
-	}
-	if client.maxRetries != 3 {
-		t.Errorf("expected maxRetries %d, but got %d", 3, client.maxRetries)
-	}
-	if client.retryDelay != 10 {
-		t.Errorf("expected retryDelay %d, but got %d", 10, client.retryDelay)
 	}
 }
 
