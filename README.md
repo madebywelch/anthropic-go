@@ -52,6 +52,7 @@ import "github.com/madebywelch/anthropic-go/pkg/anthropic"
 
 func main() {
 	client, err := anthropic.NewClient(apiKey)
+
 	if err != nil {
 		log.Fatalf("Error creating client: %v", err)
 	}
