@@ -4,6 +4,9 @@ package anthropic
 type Model string
 
 const (
+	// Superior performance on tasks that require complex reasoning.
+	ClaudeV2 Model = "claude-2"
+
 	// Our largest model, ideal for a wide range of more complex tasks.
 	ClaudeV1 Model = "claude-v1"
 

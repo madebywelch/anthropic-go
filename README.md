@@ -80,20 +80,6 @@ The sky appears blue to us due to how the atmosphere scatters light from
 The sky appears blue to us due to how the atmosphere scatters light from the sun
 ```
 
-## Automatic Retries
-
-This unofficial Anthropic API client SDK supports automatic retries for requests that fail or return unexpected status codes. By using the `WithMaxRetries` and `WithRetryDelay` options, you can configure the client to automatically retry failed requests up to a specified number of times with a specified delay between attempts. This can help improve the reliability of your API calls, particularly in case of temporary network issues or server-side errors.
-
-**Example:**
-
-```go
-_, _ := anthropic.NewClient(
-	apiKey,
-	anthropic.WithMaxRetries(5),               // Retry up to 5 times
-	anthropic.WithRetryDelay(3 * time.Second), // 3-second delay between retries
-)
-```
-
 ## Contributing
 
 Contributions to this project are welcome. To contribute, follow these steps:
