@@ -29,7 +29,7 @@ func NewClient(apiKey string) (*Client, error) {
 // doRequest is a wrapper function that handles retries and delays for all API calls.
 func (c *Client) doRequest(request *http.Request) (*http.Response, error) {
 
-	request.Header.Add("anthropic-version", "2023-01-01") // This SDK is not compatible with 2023-06-01
+	request.Header.Add("anthropic-version", "2023-06-01")
 
 	var (
 		response *http.Response

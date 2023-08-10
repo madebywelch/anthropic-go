@@ -25,9 +25,17 @@ type CompletionRequest struct {
 // CompletionResponse is the response from the Anthropic API for a completion request.
 type CompletionResponse struct {
 	Completion string `json:"completion"`
-	Delta      string `json:"delta,omitempty"`
 	StopReason string `json:"stop_reason"`
 	Stop       string `json:"stop"`
+}
+
+// StreamResponse is the response from the Anthropic API for a stream of completions.
+type StreamResponse struct {
+	Completion string `json:"completion"`
+	StopReason string `json:"stop_reason"`
+	Model      string `json:"model"`
+	Stop       string `json:"stop"`
+	LogID      string `json:"log_id"`
 }
 
 // StreamCallback is a function that handles a stream of completions.
@@ -104,49 +112,25 @@ func (c *Client) sendCompletionRequestStream(req *CompletionRequest, callback St
 // processSseStream reads the SSE stream from the API and calls the callback for each completion.
 func (c *Client) processSseStream(reader io.Reader, callback StreamCallback) (*CompletionResponse, error) {
 	scanner := bufio.NewScanner(reader)
-	var dataBuffer bytes.Buffer
-	var prev string
+	var completionResponse CompletionResponse
 
 	for scanner.Scan() {
 		line := scanner.Text()
-
-		if strings.HasPrefix(line, ":") {
-			continue
-		}
-
-		if line == "data: [DONE]" {
-			break
-		}
-
 		if strings.HasPrefix(line, "data:") {
 			data := strings.TrimSpace(line[5:])
-			dataBuffer.WriteString(data)
-		} else if line == "" {
-			if dataBuffer.Len() > 0 {
-				var completionResponse CompletionResponse
-				err := json.Unmarshal(dataBuffer.Bytes(), &completionResponse)
-				dataBuffer.Reset()
 
-				if prev != "" {
-					arr := strings.SplitAfter(completionResponse.Completion, prev)
+			var event StreamResponse
+			err := json.Unmarshal([]byte(data), &event)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding event data: %w", err)
+			}
 
-					if len(arr) > 1 {
-						completionResponse.Delta = arr[1]
-					} else {
-						return nil, fmt.Errorf("could not compute delta")
-					}
-				} else {
-					completionResponse.Delta = completionResponse.Completion
-				}
+			completionResponse.Completion += event.Completion
+			completionResponse.StopReason = event.StopReason
+			completionResponse.Stop = event.Stop
 
-				prev = completionResponse.Completion
-
-				if err != nil {
-					return nil, fmt.Errorf("error decoding completion response: %w", err)
-				}
-				if err := callback(&completionResponse); err != nil {
-					return nil, err
-				}
+			if err := callback(&completionResponse); err != nil {
+				return nil, err
 			}
 		}
 	}
@@ -155,14 +139,5 @@ func (c *Client) processSseStream(reader io.Reader, callback StreamCallback) (*C
 		return nil, fmt.Errorf("error reading from stream: %w", err)
 	}
 
-	return nil, nil
-}
-
-// GetPrompt returns a prompt string that can be used to complete a user question.
-func GetPrompt(userQuestion string) string {
-	const promptTemplate = `
-Human: %s
-
-Assistant:`
-	return fmt.Sprintf(promptTemplate, strings.TrimSpace(userQuestion))
+	return &completionResponse, nil
 }

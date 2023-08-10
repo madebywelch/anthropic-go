@@ -29,7 +29,7 @@ func main() {
 	}
 
 	response, _ := client.Complete(&anthropic.CompletionRequest{
-		Prompt:            "Human: Why is the sky blue?",
+		Prompt:            GetPrompt("Why is the sky blue?"),
 		Model:             anthropic.ClaudeV1,
 		MaxTokensToSample: 100,
 		StopSequences:     []string{"\r", "Human:"},
@@ -57,13 +57,12 @@ func main() {
 	}
 
 	_, err := client.Complete(&anthropic.CompletionRequest{
-		Prompt:            "Human: Why is the sky blue?",
+		Prompt:            GetPrompt("Why is the sky blue?"),
 		Model:             ClaudeV1,
 		MaxTokensToSample: 25,
 		Stream:            true,
 	}, func(response *anthropic.CompletionResponse) error {
 		fmt.Printf("Completion: %s\n", response.Completion)
-		fmt.Printf("Delta: %s\n", response.Delta) // diff
 		return nil
 	})
 }
