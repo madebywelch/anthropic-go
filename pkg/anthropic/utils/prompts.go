@@ -1,4 +1,4 @@
-package anthropic
+package utils
 
 import (
 	"fmt"
@@ -12,16 +12,18 @@ type Message struct {
 }
 
 // GetPrompt returns a prompt string that can be used to complete a user question.
-func GetPrompt(userQuestion string) string {
-	return fmt.Sprintf("Human: %s\n\nAssistant:", strings.TrimSpace(userQuestion))
+func GetPrompt(userQuestion string) (string, error) {
+	prompt := fmt.Sprintf("\n\nHuman: %s\n\nAssistant:", strings.TrimSpace(userQuestion))
+	return prompt, nil
 }
 
 // GetChatPrompt constructs a prompt string from a series of messages in a chat conversation.
-func GetChatPrompt(chat []Message) string {
+func GetChatPrompt(chat []Message) (string, error) {
 	var builder strings.Builder
 	for _, message := range chat {
-		builder.WriteString(fmt.Sprintf("%s: %s\n\n", message.Sender, message.Content))
+		builder.WriteString(fmt.Sprintf("\n\n%s: %s", message.Sender, message.Content))
 	}
-	builder.WriteString("Assistant:")
-	return builder.String()
+	builder.WriteString("\n\nAssistant:")
+
+	return builder.String(), nil
 }

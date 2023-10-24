@@ -19,21 +19,37 @@ To use the Anthropic SDK, you'll need to initialize a client and make requests t
 ## Completion Example
 
 ```go
-import "github.com/madebywelch/anthropic-go/pkg/anthropic"
+package main
+
+import (
+	"fmt"
+
+	"github.com/madebywelch/anthropic-go/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/pkg/anthropic/utils"
+)
 
 func main() {
-	client, err := anthropic.NewClient(apiKey)
-
+	client, err := anthropic.NewClient("your-api-key")
 	if err != nil {
 		panic(err)
 	}
 
-	response, _ := client.Complete(&anthropic.CompletionRequest{
-		Prompt:            GetPrompt("Why is the sky blue?"),
-		Model:             anthropic.ClaudeV1,
-		MaxTokensToSample: 100,
-		StopSequences:     []string{"\r", "Human:"},
-	}, nil)
+	prompt, err := utils.GetPrompt("Why is the sky blue?")
+	if err != nil {
+		panic(err)
+	}
+
+	request := anthropic.NewCompletionRequest(
+		prompt,
+		anthropic.WithModel(anthropic.ClaudeV1),
+		anthropic.WithMaxTokens(100),
+	)
+
+	// Note: Only use client.Complete when streaming is disabled, otherwise use client.CompleteStream!
+	response, err := client.Complete(request)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Completion: %s\n", response.Completion)
 }
@@ -48,35 +64,59 @@ The sky appears blue to us due to the way the atmosphere scatters light from the
 ## Streaming Example
 
 ```go
-import "github.com/madebywelch/anthropic-go/pkg/anthropic"
+package main
+
+import (
+	"fmt"
+
+	"github.com/madebywelch/anthropic-go/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/pkg/anthropic/utils"
+)
 
 func main() {
-	client, err := anthropic.NewClient(apiKey)
+	client, err := anthropic.NewClient("your-api-key")
 	if err != nil {
-		log.Fatalf("Error creating client: %v", err)
+		panic(err)
 	}
 
-	_, err := client.Complete(&anthropic.CompletionRequest{
-		Prompt:            GetPrompt("Why is the sky blue?"),
-		Model:             ClaudeV1,
-		MaxTokensToSample: 25,
-		Stream:            true,
-	}, func(response *anthropic.CompletionResponse) error {
-		fmt.Printf("Completion: %s\n", response.Completion)
-		return nil
-	})
+	prompt, err := utils.GetPrompt("Why is the sky blue?")
+	if err != nil {
+		panic(err)
+	}
+
+	request := anthropic.NewCompletionRequest(
+		prompt,
+		anthropic.WithModel(anthropic.ClaudeV1),
+		anthropic.WithMaxTokens(100),
+		anthropic.WithStreaming(true),
+	)
+
+	// Note: Only use client.CompleteStream when streaming is enabled, otherwise use client.Complete!
+	resps, errs := client.CompleteStream(request)
+
+	for {
+		select {
+		case resp := <-resps:
+			fmt.Printf("Completion: %s\n", resp.Completion)
+		case err := <-errs:
+			panic(err)
+		}
+	}
 }
 ```
 
 ### Streaming Example Output
 
 ```
-The sky appears blue to
-The sky appears blue to us due to how
-The sky appears blue to us due to how the
-The sky appears blue to us due to how the atmosphere
-The sky appears blue to us due to how the atmosphere scatters light from
-The sky appears blue to us due to how the atmosphere scatters light from the sun
+There
+are
+a
+few
+reasons
+why
+the
+sky
+appears
 ```
 
 ## Contributing
