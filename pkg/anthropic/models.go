@@ -4,6 +4,9 @@ package anthropic
 type Model string
 
 const (
+	// 200,000 token context window
+	ClaudeV2_1 Model = "claude-2.1"
+
 	// Superior performance on tasks that require complex reasoning.
 	ClaudeV2 Model = "claude-2"
 
