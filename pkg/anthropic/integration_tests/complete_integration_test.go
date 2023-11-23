@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/madebywelch/anthropic-go/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/pkg/anthropic/utils"
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic/utils"
 )
 
 func TestCompleteIntegration(t *testing.T) {

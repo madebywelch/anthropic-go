@@ -9,7 +9,7 @@ This project provides an unofficial Go SDK for Anthropic, a A next-generation AI
 You can install the Anthropic SDK in Go using go get:
 
 ```go
-go get github.com/madebywelch/anthropic-go
+go get github.com/madebywelch/anthropic-go/v2
 ```
 
 ## Usage
@@ -24,8 +24,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/madebywelch/anthropic-go/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/pkg/anthropic/utils"
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic/utils"
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 
 	request := anthropic.NewCompletionRequest(
 		prompt,
-		anthropic.WithModel(anthropic.ClaudeV1),
+		anthropic.WithModel(anthropic.ClaudeV2_1),
 		anthropic.WithMaxTokens(100),
 	)
 
@@ -69,8 +69,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/madebywelch/anthropic-go/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/pkg/anthropic/utils"
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic/utils"
 )
 
 func main() {
@@ -86,7 +86,7 @@ func main() {
 
 	request := anthropic.NewCompletionRequest(
 		prompt,
-		anthropic.WithModel(anthropic.ClaudeV1),
+		anthropic.WithModel(anthropic.ClaudeV2_1),
 		anthropic.WithMaxTokens(100),
 		anthropic.WithStreaming(true),
 	)
