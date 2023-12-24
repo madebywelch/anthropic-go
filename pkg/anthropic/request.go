@@ -24,3 +24,23 @@ func NewCompletionRequest(prompt string, options ...CompletionOption) *Completio
 	}
 	return request
 }
+
+// MessagePartRequest is a subset of the request for the Anthropic API message request.
+type MessagePartRequest struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// MessageRequest is the request to the Anthropic API for a message request.
+type MessageRequest struct {
+	Model             Model                `json:"model"`
+	Messages          []MessagePartRequest `json:"messages"`
+	MaxTokensToSample int                  `json:"max_tokens"`
+	SystemPrompt      string               `json:"system,omitempty"`         // optional
+	Metadata          interface{}          `json:"metadata,omitempty"`       // optional
+	StopSequences     []string             `json:"stop_sequences,omitempty"` // optional
+	Stream            bool                 `json:"stream,omitempty"`         // optional
+	Temperature       float64              `json:"temperature,omitempty"`    // optional
+	TopK              int                  `json:"top_k,omitempty"`          // optional
+	TopP              float64              `json:"top_p,omitempty"`          // optional
+}

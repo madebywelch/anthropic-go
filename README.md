@@ -61,7 +61,7 @@ func main() {
 The sky appears blue to us due to the way the atmosphere scatters light from the sun
 ```
 
-## Streaming Example
+## Completion Streaming Example
 
 ```go
 package main
@@ -105,7 +105,7 @@ func main() {
 }
 ```
 
-### Streaming Example Output
+### Completion Streaming Example Output
 
 ```
 There
@@ -118,6 +118,50 @@ the
 sky
 appears
 ```
+
+## (BETA) Messages Example
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+)
+
+func main() {
+	client, err := anthropic.NewClient("your-api-key")
+	if err != nil {
+		panic(err)
+	}
+
+	// Prepare a message request
+	request := &anthropic.MessageRequest{
+		Model:             anthropic.ClaudeV2_1,
+		MaxTokensToSample: 10,
+		Messages:          []anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Anthropics!"}},
+	}
+
+	// Call the Message method
+	response, err := client.Message(request)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(response.Content)
+}
+```
+
+### Messages Example Output
+
+```
+{ID:msg_01W3bZkuMrS3h1ehqTdF84vv Type:message Model:claude-2.1 Role:assistant Content:[{Type:text Text:Hello!}] StopReason:end_turn Stop: StopSequence:}
+```
+
+## Messages Streaming Example
+
+### Not yet implemented
 
 ## Contributing
 
