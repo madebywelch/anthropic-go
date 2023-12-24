@@ -1,14 +1,22 @@
 package anthropic
 
-// CompletionEvent represents the data related to a completion event.
-type CompletionEvent struct {
-	Completion string // The completion text from the model.
-}
+// Common types for different events
+type MessageEventType string
 
-// ErrorEvent represents an error event that occurs during streaming.
-type ErrorEvent struct {
-	Error string // A string description of the error.
-}
+// Define a separate type for completion events
+type CompletionEventType string
 
-// PingEvent is an empty struct representing a ping event.
-type PingEvent struct{}
+const (
+	// Constants for message event types
+	MessageEventTypeMessageStart      MessageEventType = "message_start"
+	MessageEventTypeContentBlockStart MessageEventType = "content_block_start"
+	MessageEventTypePing              MessageEventType = "ping"
+	MessageEventTypeContentBlockDelta MessageEventType = "content_block_delta"
+	MessageEventTypeContentBlockStop  MessageEventType = "content_block_stop"
+	MessageEventTypeMessageDelta      MessageEventType = "message_delta"
+	MessageEventTypeMessageStop       MessageEventType = "message_stop"
+
+	// Constants for completion event types
+	CompletionEventTypeCompletion CompletionEventType = "completion"
+	CompletionEventTypePing       CompletionEventType = "ping"
+)
