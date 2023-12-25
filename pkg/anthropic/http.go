@@ -12,8 +12,8 @@ const (
 	AnthropicAPIMessagesBeta = "messages-2023-12-15"
 )
 
-// DoRequest sends an HTTP request and returns the response, handling any non-OK HTTP status codes.
-func (c *Client) DoRequest(request *http.Request) (*http.Response, error) {
+// doRequest sends an HTTP request and returns the response, handling any non-OK HTTP status codes.
+func (c *Client) doRequest(request *http.Request) (*http.Response, error) {
 	request.Header.Add("anthropic-version", AnthropicAPIVersion)
 
 	response, err := c.httpClient.Do(request)

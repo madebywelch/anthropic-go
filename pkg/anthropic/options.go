@@ -1,45 +1,114 @@
 package anthropic
 
 type CompletionOption func(*CompletionRequest)
+type MessageOption func(*MessageRequest)
 
-func WithModel(model Model) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.Model = model
+type GenericOption[T any] func(*T)
+
+func WithModel[T any](model Model) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.Model = model
+		case *MessageRequest:
+			v.Model = model
+		}
 	}
 }
 
-func WithMaxTokens(maxTokens int) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.MaxTokensToSample = maxTokens
+func WithMessages[T MessageRequest](messages []MessagePartRequest) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *MessageRequest:
+			v.Messages = messages
+		}
 	}
 }
 
-func WithStopSequences(stopSequences []string) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.StopSequences = stopSequences
+func WithMaxTokens[T any](maxTokens int) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.MaxTokensToSample = maxTokens
+		case *MessageRequest:
+			v.MaxTokensToSample = maxTokens
+		}
 	}
 }
 
-func WithStreaming(stream bool) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.Stream = stream
+func WithSystemPrompt[T MessageRequest](systemPrompt string) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *MessageRequest:
+			v.SystemPrompt = systemPrompt
+		}
 	}
 }
 
-func WithTemperature(temperature float64) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.Temperature = temperature
+func WithMetadata[T MessageRequest](metadata interface{}) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *MessageRequest:
+			v.Metadata = metadata
+		}
 	}
 }
 
-func WithTopK(topK int) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.TopK = topK
+func WithStreaming[T any](stream bool) GenericOption[T] {
+	return WithStream[T](stream)
+}
+
+func WithStream[T any](stream bool) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.Stream = stream
+		case *MessageRequest:
+			v.Stream = stream
+		}
 	}
 }
 
-func WithTopP(topP float64) CompletionOption {
-	return func(r *CompletionRequest) {
-		r.TopP = topP
+func WithStopSequences[T any](stopSequences []string) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.StopSequences = stopSequences
+		case *MessageRequest:
+			v.StopSequences = stopSequences
+		}
+	}
+}
+
+func WithTemperature[T any](temperature float64) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.Temperature = temperature
+		case *MessageRequest:
+			v.Temperature = temperature
+		}
+	}
+}
+
+func WithTopK[T any](topK int) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.TopK = topK
+		case *MessageRequest:
+			v.TopK = topK
+		}
+	}
+}
+
+func WithTopP[T any](topP float64) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.TopP = topP
+		case *MessageRequest:
+			v.TopP = topP
+		}
 	}
 }

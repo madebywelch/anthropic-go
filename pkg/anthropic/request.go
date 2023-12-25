@@ -12,7 +12,7 @@ type CompletionRequest struct {
 	TopP              float64  `json:"top_p,omitempty"`          // optional
 }
 
-func NewCompletionRequest(prompt string, options ...CompletionOption) *CompletionRequest {
+func NewCompletionRequest(prompt string, options ...GenericOption[CompletionRequest]) *CompletionRequest {
 	request := &CompletionRequest{
 		Prompt: prompt,
 		// defauts, can be overridden
@@ -43,4 +43,17 @@ type MessageRequest struct {
 	Temperature       float64              `json:"temperature,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
+}
+
+func NewMessageRequest(messages []MessagePartRequest, options ...GenericOption[MessageRequest]) *MessageRequest {
+	request := &MessageRequest{
+		Messages: messages,
+		// defauts, can be overridden
+		Model:             ClaudeV2,
+		MaxTokensToSample: 25,
+	}
+	for _, option := range options {
+		option(request)
+	}
+	return request
 }

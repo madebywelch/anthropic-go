@@ -39,12 +39,12 @@ func TestComplete(t *testing.T) {
 func TestCompleteWithParameters(t *testing.T) {
 	// Prepare a completion request
 	request := NewCompletionRequest("Why is the sky blue?",
-		WithModel(ClaudeInstantV1_1_100k),
-		WithTemperature(0.5),
-		WithMaxTokens(10),
-		WithTopK(5),
-		WithTopP(0.9),
-		WithStopSequences([]string{"\n", "Why is the sky blue?"}),
+		WithModel[CompletionRequest](ClaudeInstantV1_1_100k),
+		WithTemperature[CompletionRequest](0.5),
+		WithMaxTokens[CompletionRequest](10),
+		WithTopK[CompletionRequest](5),
+		WithTopP[CompletionRequest](0.9),
+		WithStopSequences[CompletionRequest]([]string{"\n", "Why is the sky blue?"}),
 	)
 
 	if request.Prompt != "Why is the sky blue?" {
