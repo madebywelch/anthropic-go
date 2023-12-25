@@ -51,7 +51,7 @@ func (c *Client) sendCompletionRequest(req *CompletionRequest) (*CompletionRespo
 	request.Header.Set("X-Api-Key", c.apiKey)
 
 	// Use the DoRequest method to send the HTTP request
-	response, err := c.DoRequest(request)
+	response, err := c.doRequest(request)
 	if err != nil {
 		return nil, fmt.Errorf("error sending completion request: %w", err)
 	}
@@ -86,7 +86,7 @@ func (c *Client) handleStreaming(events chan StreamResponse, errCh chan error, r
 	request.Header.Set("X-Api-Key", c.apiKey)
 	request.Header.Set("Accept", "text/event-stream")
 
-	response, err := c.DoRequest(request)
+	response, err := c.doRequest(request)
 	if err != nil {
 		errCh <- fmt.Errorf("error sending completion request: %w", err)
 		return

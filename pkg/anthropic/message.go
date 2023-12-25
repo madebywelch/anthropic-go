@@ -38,7 +38,7 @@ func (c *Client) sendMessageRequest(req *MessageRequest) (*MessageResponse, erro
 	request.Header.Set("anthropic-beta", AnthropicAPIMessagesBeta)
 
 	// Use the DoRequest method to send the HTTP request
-	response, err := c.DoRequest(request)
+	response, err := c.doRequest(request)
 	if err != nil {
 		return nil, fmt.Errorf("error sending completion request: %w", err)
 	}

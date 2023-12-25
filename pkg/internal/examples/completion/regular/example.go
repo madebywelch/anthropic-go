@@ -20,20 +20,15 @@ func main() {
 
 	request := anthropic.NewCompletionRequest(
 		prompt,
-		anthropic.WithModel(anthropic.ClaudeV1),
-		anthropic.WithMaxTokens(100),
-		anthropic.WithStreaming(true),
+		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1),
+		anthropic.WithMaxTokens[anthropic.CompletionRequest](100),
 	)
 
-	// Note: Only use client.CompleteStream when streaming is enabled, otherwise use client.Complete!
-	resps, errs := client.CompleteStream(request)
-
-	for {
-		select {
-		case resp := <-resps:
-			fmt.Printf("Completion: %s\n", resp.Completion)
-		case err := <-errs:
-			panic(err)
-		}
+	// Note: Only use client.Complete when streaming is disabled, otherwise use client.CompleteStream!
+	response, err := client.Complete(request)
+	if err != nil {
+		panic(err)
 	}
+
+	fmt.Printf("Completion: %s\n", response.Completion)
 }

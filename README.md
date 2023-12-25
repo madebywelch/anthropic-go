@@ -41,8 +41,8 @@ func main() {
 
 	request := anthropic.NewCompletionRequest(
 		prompt,
-		anthropic.WithModel(anthropic.ClaudeV2_1),
-		anthropic.WithMaxTokens(100),
+		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1),
+		anthropic.WithMaxTokens[anthropic.CompletionRequest](100),
 	)
 
 	// Note: Only use client.Complete when streaming is disabled, otherwise use client.CompleteStream!
@@ -86,9 +86,9 @@ func main() {
 
 	request := anthropic.NewCompletionRequest(
 		prompt,
-		anthropic.WithModel(anthropic.ClaudeV2_1),
-		anthropic.WithMaxTokens(100),
-		anthropic.WithStreaming(true),
+		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1),
+		anthropic.WithMaxTokens[anthropic.CompletionRequest](100),
+		anthropic.WithStreaming[anthropic.CompletionRequest](true),
 	)
 
 	// Note: Only use client.CompleteStream when streaming is enabled, otherwise use client.Complete!
@@ -137,11 +137,11 @@ func main() {
 	}
 
 	// Prepare a message request
-	request := &anthropic.MessageRequest{
-		Model:             anthropic.ClaudeV2_1,
-		MaxTokensToSample: 10,
-		Messages:          []anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Anthropics!"}},
-	}
+	request := anthropic.NewMessageRequest(
+		[]anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Good Morning!"}},
+		anthropic.WithModel[anthropic.MessageRequest](anthropic.ClaudeV2_1),
+		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
+	)
 
 	// Call the Message method
 	response, err := client.Message(request)

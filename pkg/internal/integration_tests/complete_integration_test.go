@@ -65,7 +65,10 @@ func TestCompleteStreamIntegration(t *testing.T) {
 	}
 
 	// Prepare a completion request
-	request := anthropic.NewCompletionRequest(prompt, anthropic.WithStreaming(true), anthropic.WithMaxTokens(10), anthropic.WithModel(anthropic.ClaudeV2_1))
+	request := anthropic.NewCompletionRequest(prompt, 
+		anthropic.WithStreaming[anthropic.CompletionRequest](true), 
+		anthropic.WithMaxTokens[anthropic.CompletionRequest](10), 
+		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1))
 
 	// Call the Complete method (should return an error since streaming is enabled)
 	_, err = client.Complete(request)
