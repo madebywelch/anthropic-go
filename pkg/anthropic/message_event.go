@@ -133,7 +133,10 @@ func parseMessageEvent(eventType, event string) (MessageStreamResponse, error) {
 		messageStreamResponse.Type = messageStopEvent.Type
 	case "error":
 		messageErrorEvent := &MessageErrorEvent{}
-		_ = json.Unmarshal([]byte(event), &messageErrorEvent)
+		err = json.Unmarshal([]byte(event), &messageErrorEvent)
+		if err != nil {
+			return messageStreamResponse, err
+		}
 
 		// error received on stream
 		return messageStreamResponse, fmt.Errorf(
