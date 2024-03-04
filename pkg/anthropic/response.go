@@ -32,6 +32,12 @@ type MessageResponse struct {
 	StopReason   string                `json:"stop_reason"`
 	Stop         string                `json:"stop"`
 	StopSequence string                `json:"stop_sequence"`
+	Usage        MessageUsage          `json:"usage"`
+}
+
+type MessageUsage struct {
+	InputTokens  int `json:"input_tokens"`
+	OutputTokens int `json:"output_tokens"`
 }
 
 type MessageStreamResponse struct {

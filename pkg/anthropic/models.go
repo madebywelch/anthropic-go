@@ -61,7 +61,7 @@ const (
 	ClaudeInstantV1_0 Model = "claude-instant-v1.0"
 )
 
-func (m Model) IsMessageStreamCompatible() bool {
+func (m Model) IsMessageCompatible() bool {
 	switch m {
 	case Claude3Opus, Claude3Sonnet, ClaudeV2_1:
 		return true

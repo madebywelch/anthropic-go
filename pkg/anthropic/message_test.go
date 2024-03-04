@@ -21,6 +21,10 @@ func TestMessage(t *testing.T) {
 				Type: "text",
 				Text: "Test message",
 			}},
+			Usage: MessageUsage{
+				InputTokens:  10,
+				OutputTokens: 5,
+			},
 		}
 		json.NewEncoder(w).Encode(resp)
 	}))
@@ -76,6 +80,37 @@ func TestMessageErrorHandling(t *testing.T) {
 	_, err = client.Message(request)
 	if err == nil {
 		t.Fatal("Expected an error, got none")
+	}
+}
+
+func TestMessageIncompatibleModel(t *testing.T) {
+	// Create client
+	client, err := NewClient("fake-api-key")
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	// Prepare a message request with streaming set to true
+	request := &MessageRequest{
+		Model:    ClaudeV2,
+		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+	}
+
+	// Call the MessageStream method expecting an error
+	_, err = client.Message(request)
+
+	if err == nil {
+		t.Fatal("Expected an error for streaming not supported, got none")
+	}
+
+	expErr := fmt.Sprintf("model %s is not compatible with the message endpoint", request.Model)
+
+	if err.Error() != expErr {
+		t.Fatalf(
+			"Expected error %s, got %s",
+			expErr,
+			err.Error(),
+		)
 	}
 }
 
