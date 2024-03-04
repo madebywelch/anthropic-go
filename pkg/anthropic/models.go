@@ -3,8 +3,18 @@ package anthropic
 // Model represents a Claude model.
 type Model string
 
+// https://docs.anthropic.com/claude/docs/models-overview
 const (
-	// 200,000 token context window
+	// Most powerful model for highly complex tasks.
+	Claude3Opus Model = "claude-3-opus-20240229"
+
+	// Ideal balance of intelligence and speed for enterprise workloads
+	Claude3Sonnet Model = "claude-3-sonnet-20240229"
+
+	// Fastest and most compact model for near-instant responsiveness
+	// Claude 3 Haiku: Coming soon. Not yet available as of Mar 4 2024.
+
+	// Updated version of Claude 2 with improved accuracy
 	ClaudeV2_1 Model = "claude-2.1"
 
 	// Superior performance on tasks that require complex reasoning.
