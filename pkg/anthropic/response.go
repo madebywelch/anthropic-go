@@ -33,3 +33,21 @@ type MessageResponse struct {
 	Stop         string                `json:"stop"`
 	StopSequence string                `json:"stop_sequence"`
 }
+
+type MessageStreamResponse struct {
+	Type  string             `json:"type"`
+	Delta MessageStreamDelta `json:"delta"`
+	Usage MessageStreamUsage `json:"usage"`
+}
+
+type MessageStreamDelta struct {
+	Type         string `json:"type"`
+	Text         string `json:"text"`
+	StopReason   string `json:"stop_reason"`
+	StopSequence string `json:"stop_sequence"`
+}
+
+type MessageStreamUsage struct {
+	InputTokens  int `json:"input_tokens"`
+	OutputTokens int `json:"output_tokens"`
+}
