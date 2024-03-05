@@ -200,7 +200,7 @@ func TestMessageStreamSuccess(t *testing.T) {
 		output = append(output, []byte("event: content_block_stop\n")...)
 		output = append(output, []byte("data: {\"type\": \"content_block_stop\", \"index\": 0}\n\n")...)
 		output = append(output, []byte("event: message_delta\n")...)
-		output = append(output, []byte("data: {\"type\": \"message_delta\", \"delta\": {\"stop_reason\": \"end_turn\", \"stop_sequence\":null, \"usage\":{\"output_tokens\": 15}}}\n\n")...)
+		output = append(output, []byte("data: {\"type\": \"message_delta\", \"delta\": {\"stop_reason\": \"end_turn\", \"stop_sequence\":null}, \"usage\":{\"output_tokens\": 15}}\n\n")...)
 		output = append(output, []byte("event: message_stop\n")...)
 		output = append(output, []byte("data: {\"type\": \"message_stop\"}\n\n")...)
 		w.Write(output)

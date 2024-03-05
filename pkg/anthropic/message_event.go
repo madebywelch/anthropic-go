@@ -58,10 +58,10 @@ type MessageDeltaEvent struct {
 	Delta struct {
 		StopReason   string `json:"stop_reason"`
 		StopSequence string `json:"stop_sequence"`
-		Usage        struct {
-			OutputTokens int `json:"output_tokens"`
-		} `json:"usage"`
 	} `json:"delta"`
+	Usage struct {
+		OutputTokens int `json:"output_tokens"`
+	} `json:"usage"`
 }
 
 type MessageStopEvent struct {
@@ -125,7 +125,7 @@ func parseMessageEvent(eventType, event string) (MessageStreamResponse, error) {
 		messageStreamResponse.Type = messageDeltaEvent.Type
 		messageStreamResponse.Delta.StopReason = messageDeltaEvent.Delta.StopReason
 		messageStreamResponse.Delta.StopSequence = messageDeltaEvent.Delta.StopSequence
-		messageStreamResponse.Usage.OutputTokens = messageDeltaEvent.Delta.Usage.OutputTokens
+		messageStreamResponse.Usage.OutputTokens = messageDeltaEvent.Usage.OutputTokens
 	case "message_stop":
 		messageStopEvent := &MessageStopEvent{}
 		err = json.Unmarshal([]byte(event), &messageStopEvent)
