@@ -16,15 +16,26 @@ func (c *Client) Complete(req *CompletionRequest) (*CompletionResponse, error) {
 		return nil, fmt.Errorf("cannot use Complete with a streaming request, use CompleteStream instead")
 	}
 
+	if !req.Model.IsCompleteCompatible() {
+		return nil, fmt.Errorf("model %s is not compatible with the completion endpoint", req.Model)
+	}
+
 	return c.sendCompletionRequest(req)
 }
 
 func (c *Client) CompleteStream(req *CompletionRequest) (<-chan StreamResponse, <-chan error) {
 	events := make(chan StreamResponse)
-	errCh := make(chan error)
+
+	// make this a buffered channel to allow for the error case below to return
+	errCh := make(chan error, 1)
 
 	if !req.Stream {
 		errCh <- fmt.Errorf("cannot use CompleteStream with a non-streaming request, use Complete instead")
+		return events, errCh
+	}
+
+	if !req.Model.IsCompleteCompatible() {
+		errCh <- fmt.Errorf("model %s is not compatible with the completion endpoint", req.Model)
 		return events, errCh
 	}
 
@@ -104,6 +115,7 @@ func (c *Client) processSseStream(reader io.Reader, events chan StreamResponse) 
 
 	for scanner.Scan() {
 		line := scanner.Text()
+
 		if strings.HasPrefix(line, "data:") {
 			data := strings.TrimSpace(line[5:])
 			var event StreamResponse

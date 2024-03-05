@@ -1,6 +1,7 @@
 package anthropic
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -81,5 +82,83 @@ func TestCompleteWithParameters(t *testing.T) {
 
 	if request.StopSequences[1] != "Why is the sky blue?" {
 		t.Errorf("Expected stop sequence %q, got %q", "Why is the sky blue?", request.StopSequences[1])
+	}
+}
+
+func TestCompleteIncompatibleModel(t *testing.T) {
+	// Create client
+	client, err := NewClient("fake-api-key")
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	// Prepare a completion request
+	request := NewCompletionRequest("Why is the sky blue?",
+		WithModel[CompletionRequest](Claude3Opus),
+	)
+
+	// Call the Complete method expecting an error
+	_, err = client.Complete(request)
+	if err == nil {
+		t.Fatal("Expected an incompatibility error, got none")
+	}
+
+	// Check the error message
+	expErr := fmt.Sprintf("model %s is not compatible with the completion endpoint", request.Model)
+	if err.Error() != expErr {
+		t.Fatalf("Expected error %s, got %s", expErr, err.Error())
+	}
+}
+
+func TestCompleteStreamNoStreamFlag(t *testing.T) {
+	// Create client
+	client, err := NewClient("fake-api-key")
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	// Prepare a completion request
+	request := NewCompletionRequest("Why is the sky blue?",
+		WithModel[CompletionRequest](Claude3Opus),
+	)
+
+	// Call the Complete method expecting an error
+	_, errCh := client.CompleteStream(request)
+	err = <-errCh
+	if err == nil {
+		t.Fatal("Expected a missing stream flag error, got none")
+	}
+
+	// Check the error message
+	expErr := "cannot use CompleteStream with a non-streaming request, use Complete instead"
+	if err.Error() != expErr {
+		t.Fatalf("Expected error %s, got %s", expErr, err.Error())
+	}
+}
+
+func TestCompleteStreamIncompatibleModel(t *testing.T) {
+	// Create client
+	client, err := NewClient("fake-api-key")
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	// Prepare a completion request
+	request := NewCompletionRequest("Why is the sky blue?",
+		WithModel[CompletionRequest](Claude3Opus),
+		WithStream[CompletionRequest](true),
+	)
+
+	// Call the Complete method expecting an error
+	_, errCh := client.CompleteStream(request)
+	err = <-errCh
+	if err == nil {
+		t.Fatal("Expected an incompatibility error, got none")
+	}
+
+	// Check the error message
+	expErr := fmt.Sprintf("model %s is not compatible with the completion endpoint", request.Model)
+	if err.Error() != expErr {
+		t.Fatalf("Expected error %s, got %s", expErr, err.Error())
 	}
 }

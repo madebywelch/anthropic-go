@@ -1,23 +1,46 @@
 package anthropic
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 )
 
 func (c *Client) Message(req *MessageRequest) (*MessageResponse, error) {
 	if req.Stream {
-		return nil, fmt.Errorf("cannot use Message with streaming enabled, use MessageStream instead (not yet supported)")
+		return nil, fmt.Errorf("cannot use Message with streaming enabled, use MessageStream instead.")
+	}
+
+	if !req.Model.IsMessageCompatible() {
+		return nil, fmt.Errorf("model %s is not compatible with the message endpoint", req.Model)
 	}
 
 	return c.sendMessageRequest(req)
 }
 
-// MessageStream (NOT YET SUPPORTED) returns a channel of StreamResponse objects and a channel of errors.
-func (c *Client) MessageStream(req *MessageRequest) (<-chan StreamResponse, <-chan error) {
-	return nil, nil
+func (c *Client) MessageStream(req *MessageRequest) (<-chan MessageStreamResponse, <-chan error) {
+	events := make(chan MessageStreamResponse)
+
+	// make this a buffered channel to allow for the error case below to return
+	errCh := make(chan error, 1)
+
+	if !req.Stream {
+		errCh <- fmt.Errorf("cannot use MessageStream with a non-streaming request, use Message instead")
+		return events, errCh
+	}
+
+	if !req.Model.IsMessageCompatible() {
+		errCh <- fmt.Errorf("model %s is not compatible with the messagestream endpoint", req.Model)
+		return events, errCh
+	}
+
+	go c.handleMessageStreaming(events, errCh, req)
+
+	return events, errCh
 }
 
 func (c *Client) sendMessageRequest(req *MessageRequest) (*MessageResponse, error) {
@@ -52,4 +75,72 @@ func (c *Client) sendMessageRequest(req *MessageRequest) (*MessageResponse, erro
 	}
 
 	return &messageResponse, nil
+}
+
+func (c *Client) handleMessageStreaming(events chan MessageStreamResponse, errCh chan error, req *MessageRequest) {
+	defer close(events)
+
+	data, err := json.Marshal(req)
+	if err != nil {
+		errCh <- fmt.Errorf("error marshalling message request: %w", err)
+		return
+	}
+
+	request, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/messages", c.baseURL), bytes.NewBuffer(data))
+	if err != nil {
+		errCh <- fmt.Errorf("error creating new request: %w", err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Api-Key", c.apiKey)
+	request.Header.Set("Accept", "text/event-stream")
+
+	response, err := c.doRequest(request)
+	if err != nil {
+		errCh <- fmt.Errorf("error sending message request: %w", err)
+		return
+	}
+	defer response.Body.Close()
+
+	err = c.processMessageSseStream(response.Body, events)
+	if err != nil {
+		errCh <- err
+	}
+}
+
+func (c *Client) processMessageSseStream(reader io.Reader, events chan MessageStreamResponse) error {
+	scanner := bufio.NewScanner(reader)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.HasPrefix(line, "data:") {
+			data := strings.TrimSpace(line[5:])
+
+			event := &MessageEvent{}
+			err := json.Unmarshal([]byte(data), event)
+			if err != nil {
+				return fmt.Errorf("error decoding event data: %w", err)
+			}
+
+			msg, err := parseMessageEvent(event.Type, data)
+
+			if err != nil {
+				if _, ok := err.(UnsupportedEventType); ok {
+					// ignore unsupported event types
+				} else {
+					return fmt.Errorf("error processing message stream: %v", err)
+				}
+			}
+
+			events <- msg
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error reading from stream: %w", err)
+	}
+
+	return nil
 }

@@ -60,3 +60,20 @@ const (
 	// An earlier version of ClaudeInstantV1.
 	ClaudeInstantV1_0 Model = "claude-instant-v1.0"
 )
+
+func (m Model) IsMessageCompatible() bool {
+	switch m {
+	case Claude3Opus, Claude3Sonnet, ClaudeV2_1:
+		return true
+	}
+	return false
+}
+
+func (m Model) IsCompleteCompatible() bool {
+	switch m {
+	case ClaudeV2_1, ClaudeV2, ClaudeV1, ClaudeV1_100k, ClaudeInstantV1, ClaudeInstantV1_100k, ClaudeV1_3, ClaudeV1_3_100k, ClaudeV1_2, ClaudeV1_0, ClaudeInstantV1_1, ClaudeInstantV1_1_100k, ClaudeInstantV1_0:
+		return true
+	}
+
+	return false
+}
