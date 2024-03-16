@@ -161,7 +161,79 @@ func main() {
 
 ## Messages Streaming Example
 
-### Not yet implemented
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+)
+
+func main() {
+	apiKey, ok := os.LookupEnv("ANTHROPIC_API_KEY")
+	if !ok {
+		fmt.Printf("missing ANTHROPIC_API_KEY environment variable")
+	}
+	client, err := anthropic.NewClient(apiKey)
+	if err != nil {
+		panic(err)
+	}
+
+	// Prepare a message request
+	request := anthropic.NewMessageRequest(
+		[]anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Good Morning!. How are you today?"}},
+		anthropic.WithModel[anthropic.MessageRequest](anthropic.Claude3Haiku),
+		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
+		anthropic.WithStreaming[anthropic.MessageRequest](true),
+	)
+
+	// Call the Message method
+	resps, errors := client.MessageStream(request)
+
+	for {
+		select {
+		case response := <-resps:
+			if response.Type == "content_block_delta" {
+				fmt.Println(response.Delta.Text)
+			}
+			if response.Type == "message_stop" {
+				fmt.Println("Message stop")
+				return
+			}
+		case err := <-errors:
+			fmt.Println(err)
+			return
+		}
+	}
+}
+```
+
+### Messages Streaming Example Output
+
+```
+Good
+ morning
+!
+ As
+ an
+ AI
+ language
+ model
+,
+ I
+ don
+'t
+ have
+ feelings
+ or
+ a
+ physical
+ state
+,
+ but
+```
 
 ## Contributing
 
