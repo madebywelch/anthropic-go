@@ -25,7 +25,7 @@ func NewCompletionRequest(prompt string, options ...GenericOption[CompletionRequ
 	return request
 }
 
-// Define the ContentBlock interface to allow for both TextContentBlock and ImageContentBlock
+// ContentBlock interface to allow for both TextContentBlock and ImageContentBlock
 type ContentBlock interface {
 	// This method exists solely to enforce compile-time checking of the types that implement this interface.
 	isContentBlock()
@@ -68,6 +68,7 @@ func NewTextContentBlock(text string) ContentBlock {
 	}
 }
 
+// NewImageContentBlock creates a new image content block with the given media type and base64 data.
 func NewImageContentBlock(mediaType, base64Data string) ContentBlock {
 	return ImageContentBlock{
 		Type: "image",
