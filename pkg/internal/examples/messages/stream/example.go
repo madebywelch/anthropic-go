@@ -17,7 +17,7 @@ func main() {
 	messages := []anthropic.MessagePartRequest{
 		{
 			Role:    "user",
-			Content: "Why is the sky blue?",
+			Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")},
 		},
 	}
 

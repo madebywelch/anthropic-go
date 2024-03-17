@@ -12,11 +12,15 @@ import (
 
 func (c *Client) Message(req *MessageRequest) (*MessageResponse, error) {
 	if req.Stream {
-		return nil, fmt.Errorf("cannot use Message with streaming enabled, use MessageStream instead.")
+		return nil, fmt.Errorf("cannot use Message with streaming enabled, use MessageStream instead")
 	}
 
 	if !req.Model.IsMessageCompatible() {
 		return nil, fmt.Errorf("model %s is not compatible with the message endpoint", req.Model)
+	}
+
+	if !req.Model.IsImageCompatible() && req.ContainsImageContent() {
+		return nil, fmt.Errorf("model %s does not support image content", req.Model)
 	}
 
 	return c.sendMessageRequest(req)

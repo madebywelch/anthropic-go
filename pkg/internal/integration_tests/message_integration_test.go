@@ -7,6 +7,41 @@ import (
 	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
 )
 
+func TestMessageWithImageIntegration(t *testing.T) {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		t.Skip("ANTHROPIC_API_KEY environment variable is not set, skipping integration test")
+	}
+
+	client, err := anthropic.NewClient(apiKey)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	request := &anthropic.MessageRequest{
+		Model:             anthropic.Claude3Opus,
+		MaxTokensToSample: 50,
+		Messages: []anthropic.MessagePartRequest{
+			{
+				Role: "user",
+				Content: []anthropic.ContentBlock{
+					anthropic.NewImageContentBlock("image/png", "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FABJADveWkH6oAAAAAElFTkSuQmCC"),
+					anthropic.NewTextContentBlock("What is this image?"),
+				},
+			},
+		},
+	}
+
+	response, err := client.Message(request)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	if response == nil || len(response.Content) == 0 {
+		t.Errorf("Expected a message response, got none or empty content")
+	}
+}
+
 func TestMessageIntegration(t *testing.T) {
 	// Get the API key from the environment
 	apiKey := os.Getenv("ANTHROPIC_API_KEY")
@@ -24,7 +59,7 @@ func TestMessageIntegration(t *testing.T) {
 	request := &anthropic.MessageRequest{
 		Model:             anthropic.ClaudeV2_1,
 		MaxTokensToSample: 10,
-		Messages:          []anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Anthropics!"}},
+		Messages:          []anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, Anthropics!")}}},
 	}
 
 	// Call the Message method
@@ -60,7 +95,7 @@ func TestMessageErrorHandlingIntegration(t *testing.T) {
 	// Prepare a message request
 	request := &anthropic.MessageRequest{
 		Model:    anthropic.ClaudeV2_1,
-		Messages: []anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Anthropics!"}},
+		Messages: []anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, Anthropics!")}}},
 	}
 
 	// Call the Message method expecting an error

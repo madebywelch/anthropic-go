@@ -82,7 +82,7 @@ type UnsupportedEventType struct {
 }
 
 func (e UnsupportedEventType) Error() string {
-	return fmt.Sprintf("%s", e.Msg)
+	return e.Msg
 }
 
 func parseMessageEvent(eventType, event string) (MessageStreamResponse, error) {

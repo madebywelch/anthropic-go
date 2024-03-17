@@ -40,7 +40,7 @@ func TestMessage(t *testing.T) {
 	// Prepare a message request
 	request := &MessageRequest{
 		Model:    ClaudeV2_1,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 	}
 
 	// Call the Message method
@@ -73,7 +73,7 @@ func TestMessageErrorHandling(t *testing.T) {
 	// Prepare a message request
 	request := &MessageRequest{
 		Model:    ClaudeV2_1,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 	}
 
 	// Call the Message method expecting an error
@@ -93,7 +93,7 @@ func TestMessageIncompatibleModel(t *testing.T) {
 	// Prepare a message request with streaming set to true
 	request := &MessageRequest{
 		Model:    ClaudeV2,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 	}
 
 	// Call the MessageStream method expecting an error
@@ -124,7 +124,7 @@ func TestMessageStreamNoStreamFlag(t *testing.T) {
 	// Prepare a message request without streaming
 	request := &MessageRequest{
 		Model:    ClaudeV2,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 	}
 
 	// Call the MessageStream method expecting an error
@@ -156,7 +156,7 @@ func TestMessageStreamIncompatibleModel(t *testing.T) {
 	// Prepare a message request with streaming set to true
 	request := &MessageRequest{
 		Model:    ClaudeV2,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 		Stream:   true,
 	}
 
@@ -217,7 +217,7 @@ func TestMessageStreamSuccess(t *testing.T) {
 	// Prepare a message request
 	request := &MessageRequest{
 		Model:    Claude3Opus,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 		Stream:   true,
 	}
 
@@ -287,7 +287,7 @@ func TestMessageStreamErrorInStream(t *testing.T) {
 	// Prepare a message request
 	request := &MessageRequest{
 		Model:    Claude3Opus,
-		Messages: []MessagePartRequest{{Role: "user", Content: "Hello"}},
+		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
 		Stream:   true,
 	}
 
