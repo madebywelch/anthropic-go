@@ -25,7 +25,7 @@ func TestMessageWithImageIntegration(t *testing.T) {
 			{
 				Role: "user",
 				Content: []anthropic.ContentBlock{
-					anthropic.NewImageContentBlock("image/png", "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FABJADveWkH6oAAAAAElFTkSuQmCC"),
+					anthropic.NewImageContentBlock(anthropic.MediaTypePNG, "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQz0AEYBxVSF+FABJADveWkH6oAAAAAElFTkSuQmCC"),
 					anthropic.NewTextContentBlock("What is this image?"),
 				},
 			},

@@ -41,9 +41,9 @@ func (t TextContentBlock) isContentBlock() {}
 
 // ImageSource represents the source of an image, supporting base64 encoding for now.
 type ImageSource struct {
-	Type      string `json:"type"`
-	MediaType string `json:"media_type"`
-	Data      string `json:"data"`
+	Type      string    `json:"type"`
+	MediaType MediaType `json:"media_type"`
+	Data      string    `json:"data"`
 }
 
 // ImageContentBlock represents a block of image content.
@@ -68,8 +68,17 @@ func NewTextContentBlock(text string) ContentBlock {
 	}
 }
 
+type MediaType string
+
+const (
+	MediaTypeJPEG MediaType = "image/jpeg"
+	MediaTypePNG  MediaType = "image/png"
+	MediaTypeGIF  MediaType = "image/gif"
+	MediaTypeWEBP MediaType = "image/webp"
+)
+
 // NewImageContentBlock creates a new image content block with the given media type and base64 data.
-func NewImageContentBlock(mediaType, base64Data string) ContentBlock {
+func NewImageContentBlock(mediaType MediaType, base64Data string) ContentBlock {
 	return ImageContentBlock{
 		Type: "image",
 		Source: ImageSource{
@@ -92,6 +101,18 @@ type MessageRequest struct {
 	Temperature       float64              `json:"temperature,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
+}
+
+func (m *MessageRequest) CountImageContent() int {
+	count := 0
+	for _, message := range m.Messages {
+		for _, block := range message.Content {
+			if _, ok := block.(ImageContentBlock); ok {
+				count++
+			}
+		}
+	}
+	return count
 }
 
 func (m *MessageRequest) ContainsImageContent() bool {

@@ -23,6 +23,10 @@ func (c *Client) Message(req *MessageRequest) (*MessageResponse, error) {
 		return nil, fmt.Errorf("model %s does not support image content", req.Model)
 	}
 
+	if req.CountImageContent() > 20 {
+		return nil, fmt.Errorf("too many image content blocks, maximum is 20")
+	}
+
 	return c.sendMessageRequest(req)
 }
 
