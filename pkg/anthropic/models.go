@@ -12,9 +12,8 @@ const (
 	Claude3Sonnet Model = "claude-3-sonnet-20240229"
 
 	// Fastest and most compact model for near-instant responsiveness
-	// Claude 3 Haiku: Coming soon. Not yet available as of Mar 4 2024.
 	Claude3Haiku Model = "claude-3-haiku-20240307"
-	
+
 	// Updated version of Claude 2 with improved accuracy
 	ClaudeV2_1 Model = "claude-2.1"
 
@@ -61,6 +60,14 @@ const (
 	// An earlier version of ClaudeInstantV1.
 	ClaudeInstantV1_0 Model = "claude-instant-v1.0"
 )
+
+func (m Model) IsImageCompatible() bool {
+	switch m {
+	case Claude3Haiku, Claude3Opus, Claude3Sonnet:
+		return true
+	}
+	return false
+}
 
 func (m Model) IsMessageCompatible() bool {
 	switch m {
