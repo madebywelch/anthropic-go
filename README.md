@@ -119,7 +119,7 @@ sky
 appears
 ```
 
-## (BETA) Messages Example
+## Messages Example
 
 ```go
 package main
@@ -138,7 +138,7 @@ func main() {
 
 	// Prepare a message request
 	request := anthropic.NewMessageRequest(
-		[]anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Good Morning!"}},
+		[]anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")}}},
 		anthropic.WithModel[anthropic.MessageRequest](anthropic.ClaudeV2_1),
 		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
 	)
