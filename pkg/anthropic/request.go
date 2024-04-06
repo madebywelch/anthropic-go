@@ -12,6 +12,11 @@ type CompletionRequest struct {
 	TopP              float64  `json:"top_p,omitempty"`          // optional
 }
 
+// NewCompletionRequest creates a new CompletionRequest with the given prompt and options.
+//
+// prompt: the prompt for the completion request.
+// options: optional GenericOptions to customize the completion request.
+// Returns a pointer to the newly created CompletionRequest.
 func NewCompletionRequest(prompt string, options ...GenericOption[CompletionRequest]) *CompletionRequest {
 	request := &CompletionRequest{
 		Prompt: prompt,
@@ -122,6 +127,10 @@ type Tool struct {
 	InputSchema InputSchema `json:"input_schema"`
 }
 
+// CountImageContent counts the number of ImageContentBlock in the MessageRequest.
+//
+// No parameters.
+// Returns an integer representing the count.
 func (m *MessageRequest) CountImageContent() int {
 	count := 0
 	for _, message := range m.Messages {
@@ -134,6 +143,10 @@ func (m *MessageRequest) CountImageContent() int {
 	return count
 }
 
+// ContainsImageContent checks if the MessageRequest contains any ImageContentBlock.
+//
+// No parameters.
+// Returns a boolean value.
 func (m *MessageRequest) ContainsImageContent() bool {
 	for _, message := range m.Messages {
 		for _, block := range message.Content {
@@ -145,6 +158,8 @@ func (m *MessageRequest) ContainsImageContent() bool {
 	return false
 }
 
+// NewMessageRequest creates a new MessageRequest with the provided messages and options.
+// It takes in a slice of MessagePartRequests and optional GenericOptions and returns a pointer to a MessageRequest.
 func NewMessageRequest(messages []MessagePartRequest, options ...GenericOption[MessageRequest]) *MessageRequest {
 	request := &MessageRequest{
 		Messages: messages,
