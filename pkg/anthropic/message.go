@@ -46,6 +46,13 @@ func (c *Client) MessageStream(req *MessageRequest) (<-chan MessageStreamRespons
 		return events, errCh
 	}
 
+	if req.Stream && len(req.Tools) > 0 {
+		// https://docs.anthropic.com/claude/docs/tool-use
+		// Streaming (stream=true) is not yet supported. We plan to add streaming support in a future beta version.
+		errCh <- fmt.Errorf("cannot use streaming with tools")
+		return events, errCh
+	}
+
 	go c.handleMessageStreaming(events, errCh, req)
 
 	return events, errCh
@@ -66,7 +73,7 @@ func (c *Client) sendMessageRequest(req *MessageRequest) (*MessageResponse, erro
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Api-Key", c.apiKey)
-	request.Header.Set("anthropic-beta", AnthropicAPIMessagesBeta)
+	request.Header.Set("anthropic-beta", AnthropicAPIToolsBeta)
 
 	// Use the DoRequest method to send the HTTP request
 	response, err := c.doRequest(request)

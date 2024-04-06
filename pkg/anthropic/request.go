@@ -92,6 +92,7 @@ func NewImageContentBlock(mediaType MediaType, base64Data string) ContentBlock {
 // MessageRequest is the request to the Anthropic API for a message request.
 type MessageRequest struct {
 	Model             Model                `json:"model"`
+	Tools             []Tool               `json:"tools,omitempty"`
 	Messages          []MessagePartRequest `json:"messages"`
 	MaxTokensToSample int                  `json:"max_tokens"`
 	SystemPrompt      string               `json:"system,omitempty"`         // optional
@@ -101,6 +102,24 @@ type MessageRequest struct {
 	Temperature       float64              `json:"temperature,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
+}
+
+type Property struct {
+	Type        string   `json:"type"`
+	Enum        []string `json:"enum,omitempty"`
+	Description string   `json:"description"`
+}
+
+type InputSchema struct {
+	Type       string              `json:"type"`
+	Properties map[string]Property `json:"properties"`
+	Required   []string            `json:"required"`
+}
+
+type Tool struct {
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	InputSchema InputSchema `json:"input_schema"`
 }
 
 func (m *MessageRequest) CountImageContent() int {

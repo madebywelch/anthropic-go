@@ -20,6 +20,11 @@ type StreamResponse struct {
 type MessagePartResponse struct {
 	Type string `json:"type"`
 	Text string `json:"text"`
+
+	// Optional fields, only present for tools responses
+	ID    string                 `json:"id,omitempty"`
+	Name  string                 `json:"name,omitempty"`
+	Input map[string]interface{} `json:"input,omitempty"`
 }
 
 // MessageResponse is the response from the Anthropic API for a message response.
