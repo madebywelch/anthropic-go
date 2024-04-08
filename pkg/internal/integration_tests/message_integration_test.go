@@ -29,7 +29,7 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 					Type: "object",
 					Properties: map[string]anthropic.Property{
 						"city": {Type: "string", Description: "city to get the weather for"},
-						"unit": {Type: "string", Enum: []string{"celsius", "fahrenheit", "kelvin"}, Description: "temperature unit to return"}},
+						"unit": {Type: "string", Enum: []string{"celsius", "fahrenheit"}, Description: "temperature unit to return"}},
 					Required: []string{"city"},
 				},
 			},
