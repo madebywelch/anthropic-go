@@ -183,8 +183,8 @@ func main() {
 
 	// Prepare a message request
 	request := anthropic.NewMessageRequest(
-		[]anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Good Morning!. How are you today?"}},
-		anthropic.WithModel[anthropic.MessageRequest](anthropic.Claude3Haiku),
+		[]anthropic.MessagePartRequest{{Role: "user", Content: "Hello, Good Morning!"}},
+		anthropic.WithModel[anthropic.MessageRequest](anthropic.ClaudeV2_1),
 		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
 		anthropic.WithStreaming[anthropic.MessageRequest](true),
 	)
