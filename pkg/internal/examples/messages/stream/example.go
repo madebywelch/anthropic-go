@@ -1,13 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"strings"
-	"time"
-
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
-)
-
+/*
 func main() {
 	client, err := anthropic.NewClient("your-api-key")
 	if err != nil {
@@ -54,3 +47,4 @@ func main() {
 	fmt.Println(final.String())
 	fmt.Println("-----------------------------------------------------")
 }
+*/

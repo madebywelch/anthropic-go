@@ -3,7 +3,7 @@ package anthropic
 // CompletionRequest is the request to the Anthropic API for a completion.
 type CompletionRequest struct {
 	Prompt            string   `json:"prompt"`
-	Model             Model    `json:"model"`
+	Model             Model    `json:"model,omitempty"`
 	MaxTokensToSample int      `json:"max_tokens_to_sample"`
 	StopSequences     []string `json:"stop_sequences,omitempty"` // optional
 	Stream            bool     `json:"stream,omitempty"`         // optional

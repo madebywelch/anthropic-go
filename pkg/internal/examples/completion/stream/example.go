@@ -1,12 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic/utils"
-)
-
+/*
 func main() {
 	client, err := anthropic.NewClient("your-api-key")
 	if err != nil {
@@ -37,3 +31,4 @@ func main() {
 		}
 	}
 }
+*/

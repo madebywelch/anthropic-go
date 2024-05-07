@@ -16,7 +16,7 @@ var (
 )
 
 // mapHTTPStatusCodeToError maps an HTTP status code to an error.
-func mapHTTPStatusCodeToError(code int) error {
+func MapHTTPStatusCodeToError(code int) error {
 	switch code {
 	case http.StatusBadRequest:
 		return ErrAnthropicInvalidRequest

@@ -1,8 +1,10 @@
 // Package client contains the HTTP client and related functionality for the anthropic package.
-package anthropic
+package native
 
 import (
 	"net/http"
+
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
 )
 
 const (
@@ -10,8 +12,6 @@ const (
 	AnthropicAPIVersion = "2023-06-01"
 	// AnthropicAPIMessagesBeta is the beta version of the Anthropics API that enables the messages endpoint.
 	AnthropicAPIMessagesBeta = "messages-2023-12-15"
-	// AnthropicAPIToolsBeta is the beta version of the Anthropic API that enables the tools endpoint.
-	AnthropicAPIToolsBeta = "tools-2024-04-04"
 )
 
 // doRequest sends an HTTP request and returns the response, handling any non-OK HTTP status codes.
@@ -24,7 +24,7 @@ func (c *Client) doRequest(request *http.Request) (*http.Response, error) {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		err = mapHTTPStatusCodeToError(response.StatusCode)
+		err = anthropic.MapHTTPStatusCodeToError(response.StatusCode)
 		return nil, err
 	}
 
