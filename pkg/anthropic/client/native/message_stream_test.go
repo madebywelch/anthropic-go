@@ -1,141 +1,43 @@
-package anthropic
+package native
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
 )
-
-func TestMessage(t *testing.T) {
-	// Mock server for successful message response
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := MessageResponse{
-			ID:    "12345",
-			Type:  "testType",
-			Model: "testModel",
-			Role:  "user",
-			Content: []MessagePartResponse{{
-				Type: "text",
-				Text: "Test message",
-			}},
-			Usage: MessageUsage{
-				InputTokens:  10,
-				OutputTokens: 5,
-			},
-		}
-		json.NewEncoder(w).Encode(resp)
-	}))
-	defer testServer.Close()
-
-	// Create a new client with the test server's URL
-	client, err := NewClient("fake-api-key")
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-	client.baseURL = testServer.URL // Override baseURL to point to the test server
-
-	// Prepare a message request
-	request := &MessageRequest{
-		Model:    ClaudeV2_1,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
-	}
-
-	// Call the Message method
-	response, err := client.Message(request)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-
-	// Check the response
-	expectedContent := "Test message"
-	if len(response.Content) == 0 || response.Content[0].Text != expectedContent {
-		t.Errorf("Expected message %q, got %q", expectedContent, response.Content[0].Text)
-	}
-}
-
-func TestMessageErrorHandling(t *testing.T) {
-	// Mock server for error response
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}))
-	defer testServer.Close()
-
-	// Create a new client with the test server's URL
-	client, err := NewClient("fake-api-key")
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-	client.baseURL = testServer.URL // Override baseURL to point to the test server
-
-	// Prepare a message request
-	request := &MessageRequest{
-		Model:    ClaudeV2_1,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
-	}
-
-	// Call the Message method expecting an error
-	_, err = client.Message(request)
-	if err == nil {
-		t.Fatal("Expected an error, got none")
-	}
-}
-
-func TestMessageIncompatibleModel(t *testing.T) {
-	// Create client
-	client, err := NewClient("fake-api-key")
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-
-	// Prepare a message request with streaming set to true
-	request := &MessageRequest{
-		Model:    ClaudeV2,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
-	}
-
-	// Call the MessageStream method expecting an error
-	_, err = client.Message(request)
-
-	if err == nil {
-		t.Fatal("Expected an error for streaming not supported, got none")
-	}
-
-	expErr := fmt.Sprintf("model %s is not compatible with the message endpoint", request.Model)
-
-	if err.Error() != expErr {
-		t.Fatalf(
-			"Expected error %s, got %s",
-			expErr,
-			err.Error(),
-		)
-	}
-}
 
 func TestMessageStreamNoStreamFlag(t *testing.T) {
 	// Create client
-	client, err := NewClient("fake-api-key")
+	client, err := MakeClient(Config{
+		APIKey: "fake-api-key",
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
 	// Prepare a message request without streaming
-	request := &MessageRequest{
-		Model:    ClaudeV2,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
+	request := &anthropic.MessageRequest{
+		Model: anthropic.Claude3Opus,
+		Messages: []anthropic.MessagePartRequest{{
+			Role:    "user",
+			Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello")},
+		}},
 	}
 
 	// Call the MessageStream method expecting an error
-	_, errCh := client.MessageStream(request)
+	_, errCh := client.MessageStream(context.Background(), request)
 
 	err = <-errCh
 	if err == nil {
 		t.Fatal("Expected an error for streaming without a stream request")
 	}
 
-	expErr := "cannot use MessageStream with a non-streaming request, use Message instead"
+	expErr := "cannot use MessageStream with streaming disabled, use Message instead"
 
 	if err.Error() != expErr {
 		t.Fatalf(
@@ -148,20 +50,25 @@ func TestMessageStreamNoStreamFlag(t *testing.T) {
 
 func TestMessageStreamIncompatibleModel(t *testing.T) {
 	// Create client
-	client, err := NewClient("fake-api-key")
+	client, err := MakeClient(Config{
+		APIKey: "fake-api-key",
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
-	// Prepare a message request with streaming set to true
-	request := &MessageRequest{
-		Model:    ClaudeV2,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
-		Stream:   true,
+	// Prepare a message request without streaming
+	request := &anthropic.MessageRequest{
+		Model: anthropic.ClaudeV2,
+		Messages: []anthropic.MessagePartRequest{{
+			Role:    "user",
+			Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello")},
+		}},
+		Stream: true,
 	}
 
 	// Call the MessageStream method expecting an error
-	_, errCh := client.MessageStream(request)
+	_, errCh := client.MessageStream(context.Background(), request)
 
 	err = <-errCh
 	if err == nil {
@@ -208,22 +115,26 @@ func TestMessageStreamSuccess(t *testing.T) {
 	defer testServer.Close()
 
 	// Create a new client with the test server's URL
-	client, err := NewClient("fake-api-key")
+	client, err := MakeClient(Config{
+		APIKey:  "fake-api-key",
+		BaseURL: testServer.URL,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	client.baseURL = testServer.URL // Override baseURL to point to the test server
 
 	// Prepare a message request
-	request := &MessageRequest{
-		Model:    Claude3Opus,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
-		Stream:   true,
+	request := &anthropic.MessageRequest{
+		Model: anthropic.Claude3Opus,
+		Messages: []anthropic.MessagePartRequest{{
+			Role:    "user",
+			Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello")},
+		}},
+		Stream: true,
 	}
 
-	// Call the Complete method
-	rCh, errCh := client.MessageStream(request)
-	chunk := MessageStreamResponse{}
+	rCh, errCh := client.MessageStream(context.Background(), request)
+	chunk := &anthropic.MessageStreamResponse{}
 	final := strings.Builder{}
 	inputTokens := 0
 	outputTokens := 0
@@ -278,22 +189,27 @@ func TestMessageStreamErrorInStream(t *testing.T) {
 	defer testServer.Close()
 
 	// Create a new client with the test server's URL
-	client, err := NewClient("fake-api-key")
+	client, err := MakeClient(Config{
+		APIKey:  "fake-api-key",
+		BaseURL: testServer.URL,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	client.baseURL = testServer.URL // Override baseURL to point to the test server
 
 	// Prepare a message request
-	request := &MessageRequest{
-		Model:    Claude3Opus,
-		Messages: []MessagePartRequest{{Role: "user", Content: []ContentBlock{NewTextContentBlock("Hello")}}},
-		Stream:   true,
+	request := &anthropic.MessageRequest{
+		Model: anthropic.Claude3Opus,
+		Messages: []anthropic.MessagePartRequest{{
+			Role:    "user",
+			Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello")},
+		}},
+		Stream: true,
 	}
 
 	// Call the Complete method
-	rCh, errCh := client.MessageStream(request)
-	var chunk MessageStreamResponse
+	rCh, errCh := client.MessageStream(context.Background(), request)
+	var chunk *anthropic.MessageStreamResponse
 	final := strings.Builder{}
 	done := false
 

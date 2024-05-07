@@ -13,7 +13,8 @@ type Client struct {
 }
 
 type Config struct {
-	APIKey string
+	APIKey  string
+	BaseURL string
 }
 
 func MakeClient(cfg Config) (*Client, error) {
@@ -21,9 +22,13 @@ func MakeClient(cfg Config) (*Client, error) {
 		return nil, anthropic.ErrAnthropicApiKeyRequired
 	}
 
+	if cfg.BaseURL == "" {
+		cfg.BaseURL = "https://api.anthropic.com"
+	}
+
 	return &Client{
 		httpClient: &http.Client{},
 		apiKey:     cfg.APIKey,
-		baseURL:    "https://api.anthropic.com",
+		baseURL:    cfg.BaseURL,
 	}, nil
 }
