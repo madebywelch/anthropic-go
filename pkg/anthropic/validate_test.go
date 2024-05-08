@@ -10,6 +10,11 @@ type validateMessageTestCase struct {
 	expErr  string
 }
 
+type validateCompleteTestCase struct {
+	request *CompletionRequest
+	expErr  string
+}
+
 func TestValidateMessageRequest(t *testing.T) {
 	requests := []validateMessageTestCase{
 		{
@@ -77,4 +82,127 @@ func getTwentyOneImgs() []ContentBlock {
 	}
 
 	return blocks
+}
+
+func TestValidateMessageStreamRequest(t *testing.T) {
+	requests := []validateMessageTestCase{
+		{
+			request: &MessageRequest{
+				Stream: false,
+			},
+			expErr: "cannot use MessageStream with streaming disabled, use Message instead",
+		},
+		{
+			request: &MessageRequest{
+				Stream: true,
+				Model:  Model("not-a-valid-model"),
+			},
+			expErr: "model not-a-valid-model is not compatible with the messagestream endpoint",
+		},
+		{
+			request: &MessageRequest{
+				Stream: true,
+				Model:  ClaudeV2_1,
+				Messages: []MessagePartRequest{{
+					Role: "user",
+					Content: []ContentBlock{
+						NewImageContentBlock(MediaTypeJPEG, "a-gosh-dang-hot-dog"),
+					},
+				}},
+			},
+			expErr: fmt.Sprintf("model %s does not support image content", ClaudeV2_1),
+		},
+		{
+			request: &MessageRequest{
+				Stream: true,
+				Model:  Claude3Opus,
+				Messages: []MessagePartRequest{{
+					Role:    "user",
+					Content: getTwentyOneImgs(),
+				}},
+			},
+			expErr: fmt.Sprintf("too many image content blocks, maximum is 20"),
+		},
+	}
+
+	for _, test := range requests {
+		err := ValidateMessageStreamRequest(test.request)
+		if err == nil && test.expErr != "" {
+			t.Errorf("Expected error %s, got nil", test.expErr)
+		}
+
+		if err == nil {
+			continue
+		}
+
+		if err.Error() != test.expErr {
+			t.Errorf("Expected error %s, got %s", test.expErr, err.Error())
+		}
+	}
+}
+
+func TestValidateCompleteRequest(t *testing.T) {
+	requests := []validateCompleteTestCase{
+		{
+			request: &CompletionRequest{
+				Stream: true,
+			},
+			expErr: "cannot use Complete with streaming enabled, use CompleteStream instead",
+		},
+		{
+			request: &CompletionRequest{
+				Stream: false,
+				Model:  Model("not-a-valid-model"),
+			},
+			expErr: "model not-a-valid-model is not compatible with the completion endpoint",
+		},
+	}
+
+	for _, test := range requests {
+		err := ValidateCompleteRequest(test.request)
+		if err == nil && test.expErr != "" {
+			t.Errorf("Expected error %s, got nil", test.expErr)
+		}
+
+		if err == nil {
+			continue
+		}
+
+		if err.Error() != test.expErr {
+			t.Errorf("Expected error %s, got %s", test.expErr, err.Error())
+		}
+	}
+}
+
+func TestValidateCompleteStreamRequest(t *testing.T) {
+	requests := []validateCompleteTestCase{
+		{
+			request: &CompletionRequest{
+				Stream: false,
+			},
+			expErr: "cannot use CompleteStream with streaming disabled, use Complete instead",
+		},
+		{
+			request: &CompletionRequest{
+				Stream: true,
+				Model:  Model("not-a-valid-model"),
+			},
+			expErr: "model not-a-valid-model is not compatible with the completion endpoint",
+		},
+	}
+
+	for _, test := range requests {
+		err := ValidateCompleteStreamRequest(test.request)
+		if err == nil && test.expErr != "" {
+			t.Errorf("Expected error %s, got nil", test.expErr)
+		}
+
+		if err == nil {
+			continue
+		}
+
+		if err.Error() != test.expErr {
+			t.Errorf("Expected error %s, got %s", test.expErr, err.Error())
+		}
+	}
 }
