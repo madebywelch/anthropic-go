@@ -40,7 +40,8 @@ func (c *Client) sendCompleteRequest(ctx context.Context, req *anthropic.Complet
 	})
 
 	if err != nil {
-		return nil, err
+		errStatusCode := extractErrStatusCode(err)
+		return nil, anthropic.MapHTTPStatusCodeToError(errStatusCode)
 	}
 
 	compResp := &anthropic.CompletionResponse{}

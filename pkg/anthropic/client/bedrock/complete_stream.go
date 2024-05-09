@@ -61,7 +61,8 @@ func (c *Client) handleCompleteStreaming(
 		},
 	)
 	if err != nil {
-		errCh <- err
+		errStatusCode := extractErrStatusCode(err)
+		errCh <- anthropic.MapHTTPStatusCodeToError(errStatusCode)
 		return
 	}
 

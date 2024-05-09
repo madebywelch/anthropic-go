@@ -3,6 +3,8 @@ package bedrock
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
 
@@ -110,4 +112,19 @@ func adaptCompletionRequest(req *anthropic.CompletionRequest) *CompleteRequest {
 		CompletionRequest: *req,
 		AnthropicVersion:  AnthropicVersion,
 	}
+}
+
+func extractErrStatusCode(err error) int {
+	re := regexp.MustCompile(`StatusCode: (\d+)`)
+	match := re.FindStringSubmatch(err.Error())
+
+	if len(match) > 1 {
+		res, err := strconv.Atoi(match[1])
+		if err != nil {
+			return 0
+		}
+		return res
+	}
+
+	return 0
 }

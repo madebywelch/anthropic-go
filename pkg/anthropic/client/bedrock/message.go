@@ -41,7 +41,8 @@ func (c *Client) sendMessageRequest(ctx context.Context, req *anthropic.MessageR
 	})
 
 	if err != nil {
-		return nil, err
+		errStatusCode := extractErrStatusCode(err)
+		return nil, anthropic.MapHTTPStatusCodeToError(errStatusCode)
 	}
 
 	msgResp := &anthropic.MessageResponse{}
