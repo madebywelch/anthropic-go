@@ -1,8 +1,20 @@
 package main
 
-/*
+import (
+	"context"
+	"fmt"
+
+	anthropic "github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	client "github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/utils"
+)
+
 func main() {
-	client, err := anthropic.NewClient("your-api-key")
+	ctx := context.Background()
+	client, err := client.MakeClient(ctx, &native.Config{
+		APIKey: "your-api-key",
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -19,11 +31,10 @@ func main() {
 	)
 
 	// Note: Only use client.Complete when streaming is disabled, otherwise use client.CompleteStream!
-	response, err := client.Complete(request)
+	response, err := client.Complete(ctx, request)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("Completion: %s\n", response.Completion)
 }
-*/
