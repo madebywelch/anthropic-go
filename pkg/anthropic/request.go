@@ -94,6 +94,12 @@ func NewImageContentBlock(mediaType MediaType, base64Data string) ContentBlock {
 	}
 }
 
+// ToolChoice specifies the tool preferences for a message request.
+type ToolChoice struct {
+	Type string `json:"type"` // Type of tool choice: "tool", "any", or "auto".
+	Name string `json:"name"` // Name of the tool to be used (if type is "tool").
+}
+
 // MessageRequest is the request to the Anthropic API for a message request.
 type MessageRequest struct {
 	Model             Model                `json:"model"`
@@ -105,6 +111,7 @@ type MessageRequest struct {
 	StopSequences     []string             `json:"stop_sequences,omitempty"` // optional
 	Stream            bool                 `json:"stream,omitempty"`         // optional
 	Temperature       float64              `json:"temperature,omitempty"`    // optional
+	ToolChoice        *ToolChoice          `json:"tool_choice,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
 }
