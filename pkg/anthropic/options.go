@@ -54,6 +54,18 @@ func WithMetadata[T MessageRequest](metadata interface{}) GenericOption[T] {
 	}
 }
 
+func WithToolChoice[T MessageRequest](toolType, toolName string) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *MessageRequest:
+			v.ToolChoice = &ToolChoice{
+				Type: toolType,
+				Name: toolName,
+			}
+		}
+	}
+}
+
 func WithStreaming[T any](stream bool) GenericOption[T] {
 	return WithStream[T](stream)
 }
