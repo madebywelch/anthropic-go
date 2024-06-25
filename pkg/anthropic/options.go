@@ -1,5 +1,7 @@
 package anthropic
 
+import "net/http"
+
 type CompletionOption func(*CompletionRequest)
 type MessageOption func(*MessageRequest)
 
@@ -121,6 +123,15 @@ func WithTopP[T any](topP float64) GenericOption[T] {
 			v.TopP = topP
 		case *MessageRequest:
 			v.TopP = topP
+		}
+	}
+}
+
+// WithHTTPClient sets a custom HTTP client for the Client.
+func WithHTTPClient[T any](httpClient *http.Client) GenericOption[T] {
+	return func(r *T) {
+		if v, ok := any(r).(*Client); ok {
+			v.httpClient = httpClient
 		}
 	}
 }
