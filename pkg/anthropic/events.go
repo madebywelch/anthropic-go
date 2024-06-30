@@ -15,6 +15,7 @@ const (
 	MessageEventTypeContentBlockStop  MessageEventType = "content_block_stop"
 	MessageEventTypeMessageDelta      MessageEventType = "message_delta"
 	MessageEventTypeMessageStop       MessageEventType = "message_stop"
+	MessageEventTypeError             MessageEventType = "error"
 
 	// Constants for completion event types
 	CompletionEventTypeCompletion CompletionEventType = "completion"

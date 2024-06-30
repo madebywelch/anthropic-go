@@ -85,40 +85,40 @@ func (e UnsupportedEventType) Error() string {
 	return e.Msg
 }
 
-func parseMessageEvent(eventType, event string) (MessageStreamResponse, error) {
-	messageStreamResponse := MessageStreamResponse{}
+func ParseMessageEvent(eventType MessageEventType, event string) (*MessageStreamResponse, error) {
+	messageStreamResponse := &MessageStreamResponse{}
 	var err error
 
 	switch eventType {
-	case "message_start":
+	case MessageEventTypeMessageStart:
 		messageStartEvent := &MessageStartEvent{}
 		err = json.Unmarshal([]byte(event), &messageStartEvent)
 
 		messageStreamResponse.Type = messageStartEvent.Type
 		messageStreamResponse.Usage = messageStartEvent.Message.Usage
-	case "content_block_start":
+	case MessageEventTypeContentBlockStart:
 		contentBlockEvent := &ContentBlockStartEvent{}
 		err = json.Unmarshal([]byte(event), &contentBlockEvent)
 
 		messageStreamResponse.Type = contentBlockEvent.Type
-	case "ping":
+	case MessageEventTypePing:
 		pingEvent := &PingEvent{}
 		err = json.Unmarshal([]byte(event), &pingEvent)
 
 		messageStreamResponse.Type = pingEvent.Type
-	case "content_block_delta":
+	case MessageEventTypeContentBlockDelta:
 		contentBlockEvent := &ContentBlockDeltaEvent{}
 		err = json.Unmarshal([]byte(event), &contentBlockEvent)
 
 		messageStreamResponse.Type = contentBlockEvent.Type
 		messageStreamResponse.Delta.Type = contentBlockEvent.Delta.Type
 		messageStreamResponse.Delta.Text = contentBlockEvent.Delta.Text
-	case "content_block_stop":
+	case MessageEventTypeContentBlockStop:
 		contentBlockStopEvent := &ContentBlockStopEvent{}
 		err = json.Unmarshal([]byte(event), &contentBlockStopEvent)
 
 		messageStreamResponse.Type = contentBlockStopEvent.Type
-	case "message_delta":
+	case MessageEventTypeMessageDelta:
 		messageDeltaEvent := &MessageDeltaEvent{}
 		err = json.Unmarshal([]byte(event), &messageDeltaEvent)
 
@@ -126,12 +126,12 @@ func parseMessageEvent(eventType, event string) (MessageStreamResponse, error) {
 		messageStreamResponse.Delta.StopReason = messageDeltaEvent.Delta.StopReason
 		messageStreamResponse.Delta.StopSequence = messageDeltaEvent.Delta.StopSequence
 		messageStreamResponse.Usage.OutputTokens = messageDeltaEvent.Usage.OutputTokens
-	case "message_stop":
+	case MessageEventTypeMessageStop:
 		messageStopEvent := &MessageStopEvent{}
 		err = json.Unmarshal([]byte(event), &messageStopEvent)
 
 		messageStreamResponse.Type = messageStopEvent.Type
-	case "error":
+	case MessageEventTypeError:
 		messageErrorEvent := &MessageErrorEvent{}
 		err = json.Unmarshal([]byte(event), &messageErrorEvent)
 		if err != nil {

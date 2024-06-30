@@ -1,10 +1,12 @@
 package integration_tests
 
 import (
+	"context"
 	"os"
 	"testing"
 
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func TestMessageWithToolsIntegration(t *testing.T) {
@@ -13,7 +15,11 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 		t.Skip("ANTHROPIC_API_KEY environment variable is not set, skipping integration test")
 	}
 
-	client, err := anthropic.NewClient(apiKey)
+	ctx := context.Background()
+
+	anthropicClient, err := native.MakeClient(native.Config{
+		APIKey: apiKey,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -44,7 +50,7 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 		},
 	}
 
-	response, err := client.Message(request)
+	response, err := anthropicClient.Message(ctx, request)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -64,7 +70,9 @@ func TestMessageWithForcedToolIntegration(t *testing.T) {
 		t.Skip("ANTHROPIC_API_KEY environment variable is not set, skipping integration test")
 	}
 
-	client, err := anthropic.NewClient(apiKey)
+	anthropicClient, err := native.MakeClient(native.Config{
+		APIKey: apiKey,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -99,7 +107,7 @@ func TestMessageWithForcedToolIntegration(t *testing.T) {
 		},
 	}
 
-	response, err := client.Message(request)
+	response, err := anthropicClient.Message(context.Background(), request)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -119,7 +127,9 @@ func TestMessageWithImageIntegration(t *testing.T) {
 		t.Skip("ANTHROPIC_API_KEY environment variable is not set, skipping integration test")
 	}
 
-	client, err := anthropic.NewClient(apiKey)
+	anthropicClient, err := native.MakeClient(native.Config{
+		APIKey: apiKey,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -138,7 +148,7 @@ func TestMessageWithImageIntegration(t *testing.T) {
 		},
 	}
 
-	response, err := client.Message(request)
+	response, err := anthropicClient.Message(context.Background(), request)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -156,7 +166,9 @@ func TestMessageIntegration(t *testing.T) {
 	}
 
 	// Create a new client
-	client, err := anthropic.NewClient(apiKey)
+	anthropicClient, err := native.MakeClient(native.Config{
+		APIKey: apiKey,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -169,7 +181,7 @@ func TestMessageIntegration(t *testing.T) {
 	}
 
 	// Call the Message method
-	response, err := client.Message(request)
+	response, err := anthropicClient.Message(context.Background(), request)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -193,7 +205,9 @@ func TestMessageErrorHandlingIntegration(t *testing.T) {
 	}
 
 	// Create a new client
-	client, err := anthropic.NewClient(apiKey)
+	anthropicClient, err := native.MakeClient(native.Config{
+		APIKey: apiKey,
+	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -205,12 +219,9 @@ func TestMessageErrorHandlingIntegration(t *testing.T) {
 	}
 
 	// Call the Message method expecting an error
-	_, err = client.Message(request)
+	_, err = anthropicClient.Message(context.Background(), request)
 	// We're expecting an error here because we didn't set the required field MaxTokensToSample
 	if err == nil {
 		t.Fatal("Expected an error, got none")
 	}
 }
-
-// - TODO: TestMessageWithParametersIntegration: to test sending a message with various parameters
-// - TODO: TestMessageStreamIntegration: to ensure the function correctly handles streaming requests

@@ -1,13 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func main() {
-	client, err := anthropic.NewClient("your-api-key")
+	ctx := context.Background()
+	client, err := native.MakeClient(native.Config{
+		APIKey: "your-api-key",
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -20,7 +25,7 @@ func main() {
 	)
 
 	// Call the Message method
-	response, err := client.Message(request)
+	response, err := client.Message(ctx, request)
 	if err != nil {
 		panic(err)
 	}

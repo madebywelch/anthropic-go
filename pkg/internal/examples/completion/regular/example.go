@@ -1,34 +1,32 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic/utils"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func main() {
-	client, err := anthropic.NewClient("your-api-key")
+	ctx := context.Background()
+	client, err := native.MakeClient(native.Config{
+		APIKey: "your-api-key",
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	prompt, err := utils.GetPrompt("Why is the sky blue?")
-	if err != nil {
-		panic(err)
-	}
-
-	request := anthropic.NewCompletionRequest(
-		prompt,
-		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1),
-		anthropic.WithMaxTokens[anthropic.CompletionRequest](100),
+	request := anthropic.NewMessageRequest(
+		[]anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")}}},
+		anthropic.WithModel[anthropic.MessageRequest](anthropic.Claude35Sonnet),
+		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
 	)
 
-	// Note: Only use client.Complete when streaming is disabled, otherwise use client.CompleteStream!
-	response, err := client.Complete(request)
+	response, err := client.Message(ctx, request)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Completion: %s\n", response.Completion)
+	fmt.Println(response.Content)
 }

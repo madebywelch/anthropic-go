@@ -1,15 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/madebywelch/anthropic-go/v2/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func main() {
-	client, err := anthropic.NewClient("your-api-key")
+	ctx := context.Background()
+	client, err := native.MakeClient(native.Config{
+		APIKey: "your-api-key",
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -28,10 +33,10 @@ func main() {
 		anthropic.WithStream[anthropic.MessageRequest](true),
 	)
 
-	rCh, errCh := client.MessageStream(request)
+	rCh, errCh := client.MessageStream(ctx, request)
 
 	final := strings.Builder{}
-	chunk := anthropic.MessageStreamResponse{}
+	chunk := &anthropic.MessageStreamResponse{}
 	done := false
 
 	for {
