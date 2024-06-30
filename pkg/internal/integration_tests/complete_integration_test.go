@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client"
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/utils"
 )
@@ -22,7 +21,7 @@ func TestCompleteIntegration(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a new client
-	client, err := client.MakeClient(ctx, &native.Config{
+	anthropicClient, err := native.MakeClient(native.Config{
 		APIKey: apiKey,
 	})
 	if err != nil {
@@ -39,7 +38,7 @@ func TestCompleteIntegration(t *testing.T) {
 	request := anthropic.NewCompletionRequest(prompt)
 
 	// Call the Complete method
-	response, err := client.Complete(ctx, request)
+	response, err := anthropicClient.Complete(ctx, request)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -62,7 +61,7 @@ func TestCompleteStreamIntegration(t *testing.T) {
 	ctx := context.Background()
 
 	// Create a new client
-	client, err := client.MakeClient(ctx, &native.Config{
+	anthropicClient, err := native.MakeClient(native.Config{
 		APIKey: apiKey,
 	})
 	if err != nil {
@@ -82,13 +81,13 @@ func TestCompleteStreamIntegration(t *testing.T) {
 		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1))
 
 	// Call the Complete method (should return an error since streaming is enabled)
-	_, err = client.Complete(ctx, request)
+	_, err = anthropicClient.Complete(ctx, request)
 	if err == nil {
 		t.Fatalf("Expected error: %v", err)
 	}
 
 	// Call the CompleteStream method
-	res, errs := client.CompleteStream(ctx, request)
+	res, errs := anthropicClient.CompleteStream(ctx, request)
 
 	MAX_ITERATIONS := 10
 	builder := strings.Builder{}

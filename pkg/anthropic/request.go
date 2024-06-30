@@ -94,6 +94,32 @@ func NewImageContentBlock(mediaType MediaType, base64Data string) ContentBlock {
 	}
 }
 
+// ToolResultContentBlock represents a block of tool result content.
+type ToolResultContentBlock struct {
+	Type      string      `json:"type"`
+	ToolUseID string      `json:"tool_use_id"`
+	Content   interface{} `json:"content"`
+	IsError   bool        `json:"is_error,omitempty"`
+}
+
+func (t ToolResultContentBlock) isContentBlock() {}
+
+// NewToolResultContentBlock creates a new tool result content block with the given parameters.
+func NewToolResultContentBlock(toolUseID string, content interface{}, isError bool) ContentBlock {
+	return ToolResultContentBlock{
+		Type:      "tool_result",
+		ToolUseID: toolUseID,
+		Content:   content,
+		IsError:   isError,
+	}
+}
+
+// ToolChoice specifies the tool preferences for a message request.
+type ToolChoice struct {
+	Type string `json:"type"` // Type of tool choice: "tool", "any", or "auto".
+	Name string `json:"name"` // Name of the tool to be used (if type is "tool").
+}
+
 // MessageRequest is the request to the Anthropic API for a message request.
 type MessageRequest struct {
 	Model             Model                `json:"model"`
@@ -105,6 +131,7 @@ type MessageRequest struct {
 	StopSequences     []string             `json:"stop_sequences,omitempty"` // optional
 	Stream            bool                 `json:"stream,omitempty"`         // optional
 	Temperature       float64              `json:"temperature,omitempty"`    // optional
+	ToolChoice        *ToolChoice          `json:"tool_choice,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
 }

@@ -5,13 +5,12 @@ import (
 	"fmt"
 
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client"
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func main() {
 	ctx := context.Background()
-	client, err := client.MakeClient(ctx, &native.Config{
+	client, err := native.MakeClient(native.Config{
 		APIKey: "your-api-key",
 	})
 	if err != nil {
