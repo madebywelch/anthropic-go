@@ -60,7 +60,7 @@ func main() {
 
 ## Usage
 
-For more detailed usage examples, including streaming, completion, and tool usage, please refer to the `internal/examples` directory in the repository.
+For more detailed usage examples, including streaming, completion, and tool usage, please refer to the `pkg/internal/examples` directory in the repository.
 
 ## Contributing
 
