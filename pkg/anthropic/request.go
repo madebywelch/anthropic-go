@@ -1,5 +1,7 @@
 package anthropic
 
+import "github.com/invopop/jsonschema"
+
 // CompletionRequest is the request to the Anthropic API for a completion.
 type CompletionRequest struct {
 	Prompt            string   `json:"prompt"`
@@ -116,8 +118,8 @@ func NewToolResultContentBlock(toolUseID string, content interface{}, isError bo
 
 // ToolChoice specifies the tool preferences for a message request.
 type ToolChoice struct {
-	Type string `json:"type"` // Type of tool choice: "tool", "any", or "auto".
-	Name string `json:"name"` // Name of the tool to be used (if type is "tool").
+	Type string `json:"type"` 			// Type of tool choice: "tool", "any", or "auto".
+	Name string `json:"name,omitempty"` // Name of the tool to be used (if type is "tool").
 }
 
 // MessageRequest is the request to the Anthropic API for a message request.
@@ -136,22 +138,14 @@ type MessageRequest struct {
 	TopP              float64              `json:"top_p,omitempty"`          // optional
 }
 
-type Property struct {
-	Type        string   `json:"type"`
-	Enum        []string `json:"enum,omitempty"`
-	Description string   `json:"description"`
-}
-
-type InputSchema struct {
-	Type       string              `json:"type"`
-	Properties map[string]Property `json:"properties"`
-	Required   []string            `json:"required"`
-}
-
 type Tool struct {
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	InputSchema InputSchema `json:"input_schema"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	InputSchema *jsonschema.Schema `json:"input_schema"`
+}
+
+func GenerateInputSchema(input interface{}) *jsonschema.Schema {
+	return (&jsonschema.Reflector{ExpandedStruct: true}).Reflect(input)
 }
 
 // CountImageContent counts the number of ImageContentBlock in the MessageRequest.

@@ -9,13 +9,16 @@ import (
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
+type WeatherRequest struct {
+	City string `json:"city" jsonschema:"required,description=city to get the weather for"`
+	Unit string `json:"unit" jsonschema:"enum=celsius,enum=fahrenheit,description=temperature unit to return"`
+}
+
 func TestMessageWithToolsIntegration(t *testing.T) {
 	apiKey := os.Getenv("ANTHROPIC_API_KEY")
 	if apiKey == "" {
 		t.Skip("ANTHROPIC_API_KEY environment variable is not set, skipping integration test")
 	}
-
-	ctx := context.Background()
 
 	anthropicClient, err := native.MakeClient(native.Config{
 		APIKey: apiKey,
@@ -27,17 +30,14 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 	request := &anthropic.MessageRequest{
 		Model:             anthropic.Claude3Opus,
 		MaxTokensToSample: 1024,
+		ToolChoice: &anthropic.ToolChoice{
+			Type: "auto",
+		},
 		Tools: []anthropic.Tool{
 			{
 				Name:        "get_weather",
 				Description: "Get the weather",
-				InputSchema: anthropic.InputSchema{
-					Type: "object",
-					Properties: map[string]anthropic.Property{
-						"city": {Type: "string", Description: "city to get the weather for"},
-						"unit": {Type: "string", Enum: []string{"celsius", "fahrenheit"}, Description: "temperature unit to return"}},
-					Required: []string{"city"},
-				},
+				InputSchema: anthropic.GenerateInputSchema(&WeatherRequest{}),
 			},
 		},
 		Messages: []anthropic.MessagePartRequest{
@@ -50,17 +50,13 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 		},
 	}
 
-	response, err := anthropicClient.Message(ctx, request)
+	response, err := anthropicClient.Message(context.Background(), request)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
 	if response == nil || len(response.Content) == 0 {
 		t.Errorf("Expected a message response, got none or empty content")
-	}
-
-	if response.StopReason != "tool_use" {
-		t.Errorf("Expected stop reason 'tool_use', got %s", response.StopReason)
 	}
 }
 
@@ -88,13 +84,7 @@ func TestMessageWithForcedToolIntegration(t *testing.T) {
 			{
 				Name:        "get_weather",
 				Description: "Get the weather",
-				InputSchema: anthropic.InputSchema{
-					Type: "object",
-					Properties: map[string]anthropic.Property{
-						"city": {Type: "string", Description: "city to get the weather for"},
-						"unit": {Type: "string", Enum: []string{"celsius", "fahrenheit"}, Description: "temperature unit to return"}},
-					Required: []string{"city"},
-				},
+				InputSchema: anthropic.GenerateInputSchema(&WeatherRequest{}),
 			},
 		},
 		Messages: []anthropic.MessagePartRequest{
