@@ -118,7 +118,7 @@ func NewToolResultContentBlock(toolUseID string, content interface{}, isError bo
 
 // ToolChoice specifies the tool preferences for a message request.
 type ToolChoice struct {
-	Type string `json:"type"` 			// Type of tool choice: "tool", "any", or "auto".
+	Type string `json:"type"`           // Type of tool choice: "tool", "any", or "auto".
 	Name string `json:"name,omitempty"` // Name of the tool to be used (if type is "tool").
 }
 
