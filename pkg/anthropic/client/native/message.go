@@ -37,7 +37,9 @@ func (c *Client) sendMessageRequest(
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Api-Key", c.apiKey)
-	request.Header.Set("anthropic-beta", AnthropicAPIMessagesBeta)
+	if len(req.Beta) > 0 {
+		request.Header.Set("anthropic-beta", req.Beta)
+	}
 
 	// Use the doRequest method to send the HTTP request
 	response, err := c.doRequest(request)

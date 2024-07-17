@@ -53,6 +53,9 @@ func (c *Client) handleCompleteStreaming(
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Api-Key", c.apiKey)
 	request.Header.Set("Accept", "text/event-stream")
+	if len(req.Beta) > 0 {
+		request.Header.Set("anthropic-beta", req.Beta)
+	}
 
 	response, err := c.doRequest(request)
 	if err != nil {

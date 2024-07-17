@@ -25,6 +25,17 @@ func WithMessages[T MessageRequest](messages []MessagePartRequest) GenericOption
 	}
 }
 
+func WithBeta[T any](beta string) GenericOption[T] {
+	return func(r *T) {
+		switch v := any(r).(type) {
+		case *CompletionRequest:
+			v.Beta = beta
+		case *MessageRequest:
+			v.Beta = beta
+		}
+	}
+}
+
 func WithMaxTokens[T any](maxTokens int) GenericOption[T] {
 	return func(r *T) {
 		switch v := any(r).(type) {
