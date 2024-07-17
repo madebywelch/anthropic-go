@@ -5,7 +5,6 @@ type CompletionRequest struct {
 	Prompt            string   `json:"prompt"`
 	Model             Model    `json:"model,omitempty"`
 	MaxTokensToSample int      `json:"max_tokens_to_sample"`
-	Beta              string   `json:"beta,omitempty"`           // optional
 	StopSequences     []string `json:"stop_sequences,omitempty"` // optional
 	Stream            bool     `json:"stream,omitempty"`         // optional
 	Temperature       float64  `json:"temperature,omitempty"`    // optional
@@ -127,7 +126,6 @@ type MessageRequest struct {
 	Tools             []Tool               `json:"tools,omitempty"`
 	Messages          []MessagePartRequest `json:"messages"`
 	MaxTokensToSample int                  `json:"max_tokens"`
-	Beta              string               `json:"beta,omitempty"`           // optional
 	SystemPrompt      string               `json:"system,omitempty"`         // optional
 	Metadata          interface{}          `json:"metadata,omitempty"`       // optional
 	StopSequences     []string             `json:"stop_sequences,omitempty"` // optional

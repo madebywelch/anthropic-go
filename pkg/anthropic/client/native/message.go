@@ -37,8 +37,8 @@ func (c *Client) sendMessageRequest(
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Api-Key", c.apiKey)
-	if len(req.Beta) > 0 {
-		request.Header.Set("anthropic-beta", req.Beta)
+	if len(c.beta) > 0 {
+		request.Header.Set("anthropic-beta", c.beta)
 	}
 
 	// Use the doRequest method to send the HTTP request
