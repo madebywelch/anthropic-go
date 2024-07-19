@@ -10,11 +10,13 @@ type Client struct {
 	httpClient *http.Client
 	apiKey     string
 	baseURL    string
+	beta       string
 }
 
 type Config struct {
 	APIKey  string
 	BaseURL string
+	Beta    string
 
 	// Optional (defaults to http.DefaultClient)
 	HTTPClient *http.Client
@@ -37,5 +39,6 @@ func MakeClient(cfg Config) (*Client, error) {
 		httpClient: cfg.HTTPClient,
 		apiKey:     cfg.APIKey,
 		baseURL:    cfg.BaseURL,
+		beta:       cfg.Beta,
 	}, nil
 }

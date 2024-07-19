@@ -34,6 +34,9 @@ func (c *Client) sendCompleteRequest(ctx context.Context, req *anthropic.Complet
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Api-Key", c.apiKey)
+	if len(c.beta) > 0 {
+		request.Header.Set("anthropic-beta", c.beta)
+	}
 
 	// Use the DoRequest method to send the HTTP request
 	response, err := c.doRequest(request)
