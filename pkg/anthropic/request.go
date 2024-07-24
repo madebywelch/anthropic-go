@@ -96,6 +96,29 @@ func NewImageContentBlock(mediaType MediaType, base64Data string) ContentBlock {
 	}
 }
 
+func (t ToolUseContentBlock) isContentBlock()    {}
+func (t ToolResultContentBlock) isContentBlock() {}
+
+// ToolUseContentBlock represents a block of tool use content.
+type ToolUseContentBlock struct {
+	Type  string      `json:"type"`
+	ID    string      `json:"id"`
+	Name  string      `json:"name"`
+	Input interface{} `json:"input"`
+}
+
+func NewToolUseContentBlock(id string, name string, input interface{}) ContentBlock {
+	return ToolUseContentBlock{
+		Type: "tool_use",
+		ID:   id,
+		Name: name,
+		Input: map[string]interface{}{
+			"type":  name,
+			"input": input,
+		},
+	}
+}
+
 // ToolResultContentBlock represents a block of tool result content.
 type ToolResultContentBlock struct {
 	Type      string      `json:"type"`
@@ -103,8 +126,6 @@ type ToolResultContentBlock struct {
 	Content   interface{} `json:"content"`
 	IsError   bool        `json:"is_error,omitempty"`
 }
-
-func (t ToolResultContentBlock) isContentBlock() {}
 
 // NewToolResultContentBlock creates a new tool result content block with the given parameters.
 func NewToolResultContentBlock(toolUseID string, content interface{}, isError bool) ContentBlock {
