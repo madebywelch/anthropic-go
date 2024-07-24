@@ -3,88 +3,101 @@ package anthropic
 // Model represents a Claude model.
 type Model string
 
+// DefaultModel is the default model used if none is specified.
+const DefaultModel = Claude3Sonnet
+
 // https://docs.anthropic.com/claude/docs/models-overview
 const (
-	// Highest level of intelligence and capability
+	// Claude 3 models
 	Claude35Sonnet Model = "claude-3-5-sonnet-20240620"
+	Claude3Opus    Model = "claude-3-opus-20240229"
+	Claude3Sonnet  Model = "claude-3-sonnet-20240229"
+	Claude3Haiku   Model = "claude-3-haiku-20240307"
 
-	// Most powerful model for highly complex tasks.
-	Claude3Opus Model = "claude-3-opus-20240229"
-
-	// Ideal balance of intelligence and speed for enterprise workloads
-	Claude3Sonnet Model = "claude-3-sonnet-20240229"
-
-	// Fastest and most compact model for near-instant responsiveness
-	Claude3Haiku Model = "claude-3-haiku-20240307"
-
-	// Updated version of Claude 2 with improved accuracy
+	// Claude 2 models
 	ClaudeV2_1 Model = "claude-2.1"
+	ClaudeV2   Model = "claude-2"
 
-	// Superior performance on tasks that require complex reasoning.
-	ClaudeV2 Model = "claude-2"
-
-	// Our largest model, ideal for a wide range of more complex tasks.
-	ClaudeV1 Model = "claude-v1"
-
-	// An enhanced version of ClaudeV1 with a 100,000 token context window.
-	ClaudeV1_100k Model = "claude-v1-100k"
-
-	// A smaller model with far lower latency, sampling at roughly 40 words/sec!
-	ClaudeInstantV1 Model = "claude-instant-v1"
-
-	// An enhanced version of ClaudeInstantV1 with a 100,000 token context window.
-	ClaudeInstantV1_100k Model = "claude-instant-v1-100k"
-
-	// Specific sub-versions of the models:
-
-	// More robust against red-team inputs, better at precise instruction-following,
-	// better at code, and better and non-English dialogue and writing.
-	ClaudeV1_3 Model = "claude-v1.3"
-
-	// An enhanced version of ClaudeV1_3 with a 100,000 token context window.
+	// Claude 1 models
+	ClaudeV1        Model = "claude-v1"
+	ClaudeV1_100k   Model = "claude-v1-100k"
+	ClaudeV1_3      Model = "claude-v1.3"
 	ClaudeV1_3_100k Model = "claude-v1.3-100k"
+	ClaudeV1_2      Model = "claude-v1.2"
+	ClaudeV1_0      Model = "claude-v1.0"
 
-	// An improved version of ClaudeV1, slightly improved at general helpfulness,
-	// instruction following, coding, and other tasks. It is also considerably
-	// better with non-English languages.
-	ClaudeV1_2 Model = "claude-v1.2"
-
-	// An earlier version of ClaudeV1.
-	ClaudeV1_0 Model = "claude-v1.0"
-
-	// Latest version of ClaudeInstantV1. It is better at a wide variety of tasks
-	// including writing, coding, and instruction following. It performs better on
-	// academic benchmarks, including math, reading comprehension, and coding tests.
-	ClaudeInstantV1_1 Model = "claude-instant-v1.1"
-
-	// An enhanced version of ClaudeInstantV1_1 with a 100,000 token context window.
+	// Claude Instant models
+	ClaudeInstantV1        Model = "claude-instant-v1"
+	ClaudeInstantV1_100k   Model = "claude-instant-v1-100k"
+	ClaudeInstantV1_1      Model = "claude-instant-v1.1"
 	ClaudeInstantV1_1_100k Model = "claude-instant-v1.1-100k"
-
-	// An earlier version of ClaudeInstantV1.
-	ClaudeInstantV1_0 Model = "claude-instant-v1.0"
+	ClaudeInstantV1_0      Model = "claude-instant-v1.0"
 )
 
-func (m Model) IsImageCompatible() bool {
-	switch m {
-	case Claude3Haiku, Claude3Opus, Claude3Sonnet, Claude35Sonnet:
-		return true
+var (
+	imageCompatibleModels = map[Model]bool{
+		Claude35Sonnet: true,
+		Claude3Opus:    true,
+		Claude3Sonnet:  true,
+		Claude3Haiku:   true,
 	}
-	return false
+
+	messageCompatibleModels = map[Model]bool{
+		Claude35Sonnet: true,
+		Claude3Opus:    true,
+		Claude3Sonnet:  true,
+		Claude3Haiku:   true,
+		ClaudeV2_1:     true,
+	}
+
+	completeCompatibleModels = map[Model]bool{
+		Claude35Sonnet:         true,
+		Claude3Opus:            true,
+		Claude3Sonnet:          true,
+		Claude3Haiku:           true,
+		ClaudeV2_1:             true,
+		ClaudeV2:               true,
+		ClaudeV1:               true,
+		ClaudeV1_100k:          true,
+		ClaudeInstantV1:        true,
+		ClaudeInstantV1_100k:   true,
+		ClaudeV1_3:             true,
+		ClaudeV1_3_100k:        true,
+		ClaudeV1_2:             true,
+		ClaudeV1_0:             true,
+		ClaudeInstantV1_1:      true,
+		ClaudeInstantV1_1_100k: true,
+		ClaudeInstantV1_0:      true,
+	}
+
+	validModels = make(map[Model]bool)
+)
+
+func init() {
+	// Populate validModels map
+	for model := range imageCompatibleModels {
+		validModels[model] = true
+	}
+	for model := range messageCompatibleModels {
+		validModels[model] = true
+	}
+	for model := range completeCompatibleModels {
+		validModels[model] = true
+	}
+}
+
+func (m Model) IsImageCompatible() bool {
+	return imageCompatibleModels[m]
 }
 
 func (m Model) IsMessageCompatible() bool {
-	switch m {
-	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet:
-		return true
-	}
-	return false
+	return messageCompatibleModels[m]
 }
 
 func (m Model) IsCompleteCompatible() bool {
-	switch m {
-	case ClaudeV2_1, ClaudeV2, ClaudeV1, ClaudeV1_100k, ClaudeInstantV1, ClaudeInstantV1_100k, ClaudeV1_3, ClaudeV1_3_100k, ClaudeV1_2, ClaudeV1_0, ClaudeInstantV1_1, ClaudeInstantV1_1_100k, ClaudeInstantV1_0:
-		return true
-	}
+	return completeCompatibleModels[m]
+}
 
-	return false
+func (m Model) IsValid() bool {
+	return validModels[m]
 }

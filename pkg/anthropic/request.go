@@ -15,14 +15,9 @@ type CompletionRequest struct {
 }
 
 // NewCompletionRequest creates a new CompletionRequest with the given prompt and options.
-//
-// prompt: the prompt for the completion request.
-// options: optional GenericOptions to customize the completion request.
-// Returns a pointer to the newly created CompletionRequest.
-func NewCompletionRequest(prompt string, options ...GenericOption[CompletionRequest]) *CompletionRequest {
+func NewCompletionRequest(prompt string, options ...CompletionRequestOption) *CompletionRequest {
 	request := &CompletionRequest{
-		Prompt: prompt,
-		// defauts, can be overridden
+		Prompt:            prompt,
 		Model:             ClaudeV2,
 		MaxTokensToSample: 25,
 	}
@@ -96,6 +91,29 @@ func NewImageContentBlock(mediaType MediaType, base64Data string) ContentBlock {
 	}
 }
 
+func (t ToolUseContentBlock) isContentBlock()    {}
+func (t ToolResultContentBlock) isContentBlock() {}
+
+// ToolUseContentBlock represents a block of tool use content.
+type ToolUseContentBlock struct {
+	Type  string      `json:"type"`
+	ID    string      `json:"id"`
+	Name  string      `json:"name"`
+	Input interface{} `json:"input"`
+}
+
+func NewToolUseContentBlock(id string, name string, input interface{}) ContentBlock {
+	return ToolUseContentBlock{
+		Type: "tool_use",
+		ID:   id,
+		Name: name,
+		Input: map[string]interface{}{
+			"type":  name,
+			"input": input,
+		},
+	}
+}
+
 // ToolResultContentBlock represents a block of tool result content.
 type ToolResultContentBlock struct {
 	Type      string      `json:"type"`
@@ -103,8 +121,6 @@ type ToolResultContentBlock struct {
 	Content   interface{} `json:"content"`
 	IsError   bool        `json:"is_error,omitempty"`
 }
-
-func (t ToolResultContentBlock) isContentBlock() {}
 
 // NewToolResultContentBlock creates a new tool result content block with the given parameters.
 func NewToolResultContentBlock(toolUseID string, content interface{}, isError bool) ContentBlock {
@@ -179,12 +195,9 @@ func (m *MessageRequest) ContainsImageContent() bool {
 	return false
 }
 
-// NewMessageRequest creates a new MessageRequest with the provided messages and options.
-// It takes in a slice of MessagePartRequests and optional GenericOptions and returns a pointer to a MessageRequest.
-func NewMessageRequest(messages []MessagePartRequest, options ...GenericOption[MessageRequest]) *MessageRequest {
+// NewMessageRequest creates a new MessageRequest with the provided options.
+func NewMessageRequest(options ...MessageRequestOption) *MessageRequest {
 	request := &MessageRequest{
-		Messages: messages,
-		// defauts, can be overridden
 		Model:             ClaudeV2,
 		MaxTokensToSample: 25,
 	}
@@ -192,4 +205,23 @@ func NewMessageRequest(messages []MessagePartRequest, options ...GenericOption[M
 		option(request)
 	}
 	return request
+}
+
+// AddMessage adds a message to the MessageRequest.
+func (r *MessageRequest) AddMessage(role string, content ...ContentBlock) *MessageRequest {
+	r.Messages = append(r.Messages, MessagePartRequest{
+		Role:    role,
+		Content: content,
+	})
+	return r
+}
+
+// AddUserMessage adds a user message to the MessageRequest.
+func (r *MessageRequest) AddUserMessage(content ...ContentBlock) *MessageRequest {
+	return r.AddMessage("user", content...)
+}
+
+// AddAssistantMessage adds an assistant message to the MessageRequest.
+func (r *MessageRequest) AddAssistantMessage(content ...ContentBlock) *MessageRequest {
+	return r.AddMessage("assistant", content...)
 }

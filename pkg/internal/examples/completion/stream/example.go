@@ -25,9 +25,9 @@ func main() {
 
 	request := anthropic.NewCompletionRequest(
 		prompt,
-		anthropic.WithModel[anthropic.CompletionRequest](anthropic.ClaudeV2_1),
-		anthropic.WithMaxTokens[anthropic.CompletionRequest](100),
-		anthropic.WithStreaming[anthropic.CompletionRequest](true),
+		anthropic.WithCompletionModel(anthropic.ClaudeV2_1),
+		anthropic.WithCompletionMaxTokens(100),
+		anthropic.WithCompletionStream(true),
 	)
 
 	// Note: Only use client.CompleteStream when streaming is enabled, otherwise use client.Complete!

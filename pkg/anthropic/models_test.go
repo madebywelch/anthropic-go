@@ -1,145 +1,58 @@
 package anthropic
 
-import "testing"
+import (
+	"testing"
+)
 
-type modelTest struct {
-	model           Model
-	imageSupport    bool
-	messageSupport  bool
-	completeSupport bool
-}
+func TestModelCompatibility(t *testing.T) {
+	tests := []struct {
+		name         string
+		model        Model
+		wantImage    bool
+		wantMessage  bool
+		wantComplete bool
+		wantValid    bool
+	}{
+		{"Claude 3.5 Sonnet", Claude35Sonnet, true, true, true, true},
+		{"Claude 3 Opus", Claude3Opus, true, true, true, true},
+		{"Claude 3 Sonnet", Claude3Sonnet, true, true, true, true},
+		{"Claude 3 Haiku", Claude3Haiku, true, true, true, true},
+		{"Claude 2.1", ClaudeV2_1, false, true, true, true},
+		{"Claude 2", ClaudeV2, false, false, true, true},
+		{"Claude 1", ClaudeV1, false, false, true, true},
+		{"Claude 1 100k", ClaudeV1_100k, false, false, true, true},
+		{"Claude Instant V1", ClaudeInstantV1, false, false, true, true},
+		{"Claude Instant V1 100k", ClaudeInstantV1_100k, false, false, true, true},
+		{"Claude 1.3", ClaudeV1_3, false, false, true, true},
+		{"Claude 1.3 100k", ClaudeV1_3_100k, false, false, true, true},
+		{"Claude 1.2", ClaudeV1_2, false, false, true, true},
+		{"Claude 1.0", ClaudeV1_0, false, false, true, true},
+		{"Claude Instant V1.1", ClaudeInstantV1_1, false, false, true, true},
+		{"Claude Instant V1.1 100k", ClaudeInstantV1_1_100k, false, false, true, true},
+		{"Claude Instant V1.0", ClaudeInstantV1_0, false, false, true, true},
+		{"Invalid Model", Model("NOT A REAL MODEL"), false, false, false, false},
+	}
 
-func getTestCases() []modelTest {
-	return []modelTest{
-		{
-			model:           Claude3Opus,
-			imageSupport:    true,
-			messageSupport:  true,
-			completeSupport: false,
-		},
-		{
-			model:           Claude3Sonnet,
-			imageSupport:    true,
-			messageSupport:  true,
-			completeSupport: false,
-		},
-		{
-			model:           Claude3Haiku,
-			imageSupport:    true,
-			messageSupport:  true,
-			completeSupport: false,
-		},
-		{
-			model:           ClaudeV2_1,
-			imageSupport:    false,
-			messageSupport:  true,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV2,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV1,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV1_100k,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeInstantV1,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeInstantV1_100k,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV1_3,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV1_3_100k,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV1_2,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeV1_0,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeInstantV1_1,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeInstantV1_1_100k,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           ClaudeInstantV1_0,
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: true,
-		},
-		{
-			model:           Model("NOT A REAL MODEL"),
-			imageSupport:    false,
-			messageSupport:  false,
-			completeSupport: false,
-		},
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.model.IsImageCompatible(); got != tt.wantImage {
+				t.Errorf("IsImageCompatible() = %v, want %v", got, tt.wantImage)
+			}
+			if got := tt.model.IsMessageCompatible(); got != tt.wantMessage {
+				t.Errorf("IsMessageCompatible() = %v, want %v", got, tt.wantMessage)
+			}
+			if got := tt.model.IsCompleteCompatible(); got != tt.wantComplete {
+				t.Errorf("IsCompleteCompatible() = %v, want %v", got, tt.wantComplete)
+			}
+			if got := tt.model.IsValid(); got != tt.wantValid {
+				t.Errorf("IsValid() = %v, want %v", got, tt.wantValid)
+			}
+		})
 	}
 }
 
-func TestIsImageCompatible(t *testing.T) {
-	testCases := getTestCases()
-	for _, test := range testCases {
-		result := test.model.IsImageCompatible()
-		if result != test.imageSupport {
-			t.Errorf("IsImageCompatible() for model %s returned %t, expected %t", test.model, result, test.imageSupport)
-		}
-	}
-}
-func TestIsMessageCompatible(t *testing.T) {
-	testCases := getTestCases()
-	for _, test := range testCases {
-		result := test.model.IsMessageCompatible()
-		if result != test.messageSupport {
-			t.Errorf("IsMessageCompatible() for model %s returned %t, expected %t", test.model, result, test.messageSupport)
-		}
-	}
-}
-func TestIsCompleteCompatible(t *testing.T) {
-	testCases := getTestCases()
-	for _, test := range testCases {
-		result := test.model.IsCompleteCompatible()
-		if result != test.completeSupport {
-			t.Errorf("IsCompleteCompatible() for model %s returned %t, expected %t", test.model, result, test.completeSupport)
-		}
+func TestDefaultModel(t *testing.T) {
+	if DefaultModel != Claude3Sonnet {
+		t.Errorf("DefaultModel = %v, want %v", DefaultModel, Claude3Sonnet)
 	}
 }

@@ -19,9 +19,9 @@ func main() {
 
 	// Prepare a message request
 	request := anthropic.NewMessageRequest(
-		[]anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")}}},
-		anthropic.WithModel[anthropic.MessageRequest](anthropic.ClaudeV2_1),
-		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
+		anthropic.WithMessageModel(anthropic.ClaudeV2_1),
+		anthropic.WithMessageMaxTokens(20),
+		anthropic.WithMessages([]anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")}}}),
 	)
 
 	// Call the Message method

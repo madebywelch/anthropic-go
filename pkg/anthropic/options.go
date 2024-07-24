@@ -1,126 +1,122 @@
 package anthropic
 
-type CompletionOption func(*CompletionRequest)
-type MessageOption func(*MessageRequest)
+// CompletionRequestOption is a function type for CompletionRequest options
+type CompletionRequestOption func(*CompletionRequest)
 
-type GenericOption[T any] func(*T)
+// MessageRequestOption is a function type for MessageRequest options
+type MessageRequestOption func(*MessageRequest)
 
-func WithModel[T any](model Model) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.Model = model
-		case *MessageRequest:
-			v.Model = model
+// Completion Request Options
+
+func WithCompletionModel(model Model) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.Model = model
+	}
+}
+
+func WithCompletionMaxTokens(maxTokens int) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.MaxTokensToSample = maxTokens
+	}
+}
+
+func WithCompletionStream(stream bool) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.Stream = stream
+	}
+}
+
+func WithCompletionStopSequences(stopSequences []string) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.StopSequences = stopSequences
+	}
+}
+
+func WithCompletionTemperature(temperature float64) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.Temperature = temperature
+	}
+}
+
+func WithCompletionTopK(topK int) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.TopK = topK
+	}
+}
+
+func WithCompletionTopP(topP float64) CompletionRequestOption {
+	return func(r *CompletionRequest) {
+		r.TopP = topP
+	}
+}
+
+// Message Request Options
+
+func WithMessageModel(model Model) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.Model = model
+	}
+}
+
+func WithMessages(messages []MessagePartRequest) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.Messages = messages
+	}
+}
+
+func WithMessageMaxTokens(maxTokens int) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.MaxTokensToSample = maxTokens
+	}
+}
+
+func WithSystemPrompt(systemPrompt string) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.SystemPrompt = systemPrompt
+	}
+}
+
+func WithMetadata(metadata interface{}) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.Metadata = metadata
+	}
+}
+
+func WithToolChoice(toolType, toolName string) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.ToolChoice = &ToolChoice{
+			Type: toolType,
+			Name: toolName,
 		}
 	}
 }
 
-func WithMessages[T MessageRequest](messages []MessagePartRequest) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *MessageRequest:
-			v.Messages = messages
-		}
+func WithMessageStream(stream bool) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.Stream = stream
 	}
 }
 
-func WithMaxTokens[T any](maxTokens int) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.MaxTokensToSample = maxTokens
-		case *MessageRequest:
-			v.MaxTokensToSample = maxTokens
-		}
+func WithMessageStopSequences(stopSequences []string) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.StopSequences = stopSequences
 	}
 }
 
-func WithSystemPrompt[T MessageRequest](systemPrompt string) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *MessageRequest:
-			v.SystemPrompt = systemPrompt
-		}
+func WithMessageTemperature(temperature float64) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.Temperature = temperature
 	}
 }
 
-func WithMetadata[T MessageRequest](metadata interface{}) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *MessageRequest:
-			v.Metadata = metadata
-		}
+func WithMessageTopK(topK int) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.TopK = topK
 	}
 }
 
-func WithToolChoice[T MessageRequest](toolType, toolName string) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *MessageRequest:
-			v.ToolChoice = &ToolChoice{
-				Type: toolType,
-				Name: toolName,
-			}
-		}
-	}
-}
-
-func WithStreaming[T any](stream bool) GenericOption[T] {
-	return WithStream[T](stream)
-}
-
-func WithStream[T any](stream bool) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.Stream = stream
-		case *MessageRequest:
-			v.Stream = stream
-		}
-	}
-}
-
-func WithStopSequences[T any](stopSequences []string) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.StopSequences = stopSequences
-		case *MessageRequest:
-			v.StopSequences = stopSequences
-		}
-	}
-}
-
-func WithTemperature[T any](temperature float64) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.Temperature = temperature
-		case *MessageRequest:
-			v.Temperature = temperature
-		}
-	}
-}
-
-func WithTopK[T any](topK int) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.TopK = topK
-		case *MessageRequest:
-			v.TopK = topK
-		}
-	}
-}
-
-func WithTopP[T any](topP float64) GenericOption[T] {
-	return func(r *T) {
-		switch v := any(r).(type) {
-		case *CompletionRequest:
-			v.TopP = topP
-		case *MessageRequest:
-			v.TopP = topP
-		}
+func WithMessageTopP(topP float64) MessageRequestOption {
+	return func(r *MessageRequest) {
+		r.TopP = topP
 	}
 }

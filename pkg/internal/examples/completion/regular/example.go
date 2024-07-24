@@ -18,9 +18,9 @@ func main() {
 	}
 
 	request := anthropic.NewMessageRequest(
-		[]anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")}}},
-		anthropic.WithModel[anthropic.MessageRequest](anthropic.Claude35Sonnet),
-		anthropic.WithMaxTokens[anthropic.MessageRequest](20),
+		anthropic.WithMessageModel(anthropic.Claude35Sonnet),
+		anthropic.WithMessageMaxTokens(20),
+		anthropic.WithMessages([]anthropic.MessagePartRequest{{Role: "user", Content: []anthropic.ContentBlock{anthropic.NewTextContentBlock("Hello, world!")}}}),
 	)
 
 	response, err := client.Message(ctx, request)
