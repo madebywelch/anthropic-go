@@ -16,10 +16,11 @@ import (
 const (
 	AnthropicVersion = "bedrock-2023-05-31"
 
-	BedrockModelClaude3Opus   = "anthropic.claude-3-opus-20240229-v1:0"
-	BedrockModelClaude3Sonnet = "anthropic.claude-3-sonnet-20240229-v1:0"
-	BedrockModelClaude3Haiku  = "anthropic.claude-3-haiku-20240307-v1:0"
-	BedrockModelClaudeV2_1    = "anthropic.claude-v2:1"
+	BedrockModelClaude35Sonnet = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+	BedrockModelClaude3Opus    = "anthropic.claude-3-opus-20240229-v1:0"
+	BedrockModelClaude3Sonnet  = "anthropic.claude-3-sonnet-20240229-v1:0"
+	BedrockModelClaude3Haiku   = "anthropic.claude-3-haiku-20240307-v1:0"
+	BedrockModelClaudeV2_1     = "anthropic.claude-v2:1"
 )
 
 type Client struct {
@@ -60,6 +61,9 @@ func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
 
 // adaptModelForMessage takes the model as defined in anthropic.Model and adapts it to the model Bedrock expects
 func adaptModelForMessage(model anthropic.Model) (string, error) {
+	if model == anthropic.Claude35Sonnet {
+		return BedrockModelClaude35Sonnet, nil
+	}
 	if model == anthropic.Claude3Opus {
 		return BedrockModelClaude3Opus, nil
 	}
