@@ -21,7 +21,7 @@ func (c *Client) Message(ctx context.Context, req *anthropic.MessageRequest) (*a
 }
 
 func (c *Client) sendMessageRequest(ctx context.Context, req *anthropic.MessageRequest) (*anthropic.MessageResponse, error) {
-	adaptedModel, err := adaptModelForMessage(req.Model)
+	adaptedModel, err := c.adaptModelForMessage(req.Model)
 	if err != nil {
 		return nil, err
 	}
