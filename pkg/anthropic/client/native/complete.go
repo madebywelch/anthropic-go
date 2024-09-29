@@ -38,6 +38,10 @@ func (c *Client) sendCompleteRequest(ctx context.Context, req *anthropic.Complet
 		request.Header.Set("anthropic-beta", c.beta)
 	}
 
+	if len(c.cache) > 0 {
+		request.Header.Set("anthropic-beta", c.cache)
+	}
+
 	// Use the DoRequest method to send the HTTP request
 	response, err := c.doRequest(request)
 	if err != nil {

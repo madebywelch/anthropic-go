@@ -57,6 +57,10 @@ func (c *Client) handleCompleteStreaming(
 		request.Header.Set("anthropic-beta", c.beta)
 	}
 
+	if len(c.cache) > 0 {
+		request.Header.Set("anthropic-beta", c.cache)
+	}
+
 	response, err := c.doRequest(request)
 	if err != nil {
 		errCh <- fmt.Errorf("error sending completion request: %w", err)
