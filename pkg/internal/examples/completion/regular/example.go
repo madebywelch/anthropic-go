@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic/client/native"
 )
 
 func main() {

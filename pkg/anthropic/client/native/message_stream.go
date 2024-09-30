@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic"
 )
 
 func (c *Client) MessageStream(ctx context.Context, req *anthropic.MessageRequest) (<-chan *anthropic.MessageStreamResponse, <-chan error) {
