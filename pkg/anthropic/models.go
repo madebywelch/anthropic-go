@@ -54,11 +54,13 @@ var (
 	}
 
 	messageCompatibleModels = map[Model]bool{
-		Claude35Sonnet: true,
-		Claude3Opus:    true,
-		Claude3Sonnet:  true,
-		Claude3Haiku:   true,
-		ClaudeV2_1:     true,
+		Claude35Sonnet:          true,
+		Claude35Sonnet_20241022: true,
+		Claude35Sonnet_20240620: true,
+		Claude3Opus:             true,
+		Claude3Sonnet:           true,
+		Claude3Haiku:            true,
+		ClaudeV2_1:              true,
 	}
 
 	completeCompatibleModels = map[Model]bool{
@@ -87,11 +89,7 @@ func (m Model) IsImageCompatible() bool {
 }
 
 func (m Model) IsMessageCompatible() bool {
-	switch m {
-	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620:
-		return true
-	}
-	return false
+	return messageCompatibleModels[m]
 }
 
 func (m Model) IsCompleteCompatible() bool {
@@ -99,5 +97,8 @@ func (m Model) IsCompleteCompatible() bool {
 }
 
 func (m Model) IsValid() bool {
-	return imageCompatibleModels[m] || messageCompatibleModels[m] || completeCompatibleModels[m]
+	_, inImage := imageCompatibleModels[m]
+	_, inMessage := messageCompatibleModels[m]
+	_, inComplete := completeCompatibleModels[m]
+	return inImage || inMessage || inComplete
 }
