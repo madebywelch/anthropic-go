@@ -37,7 +37,7 @@ func (c *Client) handleMessageStreaming(
 	defer close(msCh)
 	defer close(errCh)
 
-	adaptedModel, err := adaptModelForMessage(req.Model)
+	adaptedModel, err := c.adaptModelForMessage(req.Model)
 	if err != nil {
 		errCh <- fmt.Errorf("error adapting model: %w", err)
 		return

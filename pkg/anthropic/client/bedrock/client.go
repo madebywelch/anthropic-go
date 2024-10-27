@@ -16,24 +16,37 @@ import (
 const (
 	AnthropicVersion = "bedrock-2023-05-31"
 
-	BedrockModelClaude3Opus   = "anthropic.claude-3-opus-20240229-v1:0"
-	BedrockModelClaude3Sonnet = "anthropic.claude-3-sonnet-20240229-v1:0"
-	BedrockModelClaude3Haiku  = "anthropic.claude-3-haiku-20240307-v1:0"
-	BedrockModelClaudeV2_1    = "anthropic.claude-v2:1"
+	BedrockModelClaude35Sonnet          = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  BedrockModelClaude35Sonnet_20241022 = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+	BedrockModelClaude35Sonnet_20240620 = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+	BedrockModelClaude3Opus             = "anthropic.claude-3-opus-20240229-v1:0"
+	BedrockModelClaude3Sonnet           = "anthropic.claude-3-sonnet-20240229-v1:0"
+	BedrockModelClaude3Haiku            = "anthropic.claude-3-haiku-20240307-v1:0"
+	BedrockModelClaudeV2_1              = "anthropic.claude-v2:1"
+
+	// Cross-region top-level region code
+	CRUS = "us"
+	CREU = "eu"
 )
 
 type Client struct {
-	brCli *bedrockruntime.Client
+	brCli             *bedrockruntime.Client
+	crInferenceRegion string
 }
 
 type Config struct {
-	Region          string
-	AccessKeyID     string
-	SecretAccessKey string
-	SessionToken    string
+	Region               string
+	AccessKeyID          string
+	SecretAccessKey      string
+	SessionToken         string
+	CrossRegionInference bool
 }
 
 func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
+	if cfg.Region == "" {
+		return nil, fmt.Errorf("Region is requried for establishing anthropic bedrock client")
+	}
+
 	awsCfg, err := config.LoadDefaultConfig(
 		ctx,
 		config.WithRegion(cfg.Region),
@@ -53,27 +66,58 @@ func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
 		return nil, err
 	}
 
+	regionPrefix := ""
+	if cfg.CrossRegionInference {
+		// extract the first 2 letters from the region
+		regionPrefix = cfg.Region[:2]
+		if regionPrefix != CRUS && regionPrefix != CREU {
+			return nil, fmt.Errorf(
+				"Cross region inference is only supported for: '%s', '%s'; Region prefix: '%s' is not supported",
+				CRUS,
+				CREU,
+				regionPrefix,
+			)
+		}
+	}
+
 	return &Client{
-		brCli: bedrockruntime.NewFromConfig(awsCfg),
+		brCli:             bedrockruntime.NewFromConfig(awsCfg),
+		crInferenceRegion: regionPrefix,
 	}, nil
 }
 
 // adaptModelForMessage takes the model as defined in anthropic.Model and adapts it to the model Bedrock expects
-func adaptModelForMessage(model anthropic.Model) (string, error) {
-	if model == anthropic.Claude3Opus {
-		return BedrockModelClaude3Opus, nil
-	}
-	if model == anthropic.Claude3Sonnet {
-		return BedrockModelClaude3Sonnet, nil
-	}
-	if model == anthropic.Claude3Haiku {
-		return BedrockModelClaude3Haiku, nil
-	}
-	if model == anthropic.ClaudeV2_1 {
-		return BedrockModelClaudeV2_1, nil
+func (c *Client) adaptModelForMessage(model anthropic.Model) (string, error) {
+	adaptedModel := ""
+
+	switch model {
+	case anthropic.Claude35Sonnet:
+		adaptedModel = BedrockModelClaude35Sonnet
+  case anthropic.Claude35Sonnet_20241022:
+		adaptedModel = BedrockModelClaude35Sonnet_20241022
+	case anthropic.Claude35Sonnet_20240620:
+		adaptedModel = BedrockModelClaude35Sonnet_20240620
+	case anthropic.Claude3Opus:
+		adaptedModel = BedrockModelClaude3Opus
+	case anthropic.Claude3Sonnet:
+		adaptedModel = BedrockModelClaude3Sonnet
+	case anthropic.Claude3Haiku:
+		adaptedModel = BedrockModelClaude3Haiku
+	case anthropic.ClaudeV2_1:
+		adaptedModel = BedrockModelClaudeV2_1
+	default:
+		return "", fmt.Errorf("model %s is not compatible with the bedrock message endpoint", model)
 	}
 
-	return "", fmt.Errorf("model %s is not compatible with the bedrock message endpoint", model)
+	if c.crInferenceRegion == "" {
+		return adaptedModel, nil
+	}
+
+	if adaptedModel == BedrockModelClaudeV2_1 {
+		return "", fmt.Errorf("Bedrock model %s is not compatible with cross-region inference", adaptedModel)
+	}
+
+	return fmt.Sprintf("%s.%s", c.crInferenceRegion, adaptedModel), nil
 }
 
 // adaptModelForCompletion takes the model as defined in anthropic.Model and adapts it to the model Bedrock expects

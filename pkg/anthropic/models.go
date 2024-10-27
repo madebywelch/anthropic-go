@@ -8,11 +8,14 @@ const DefaultModel = Claude3Sonnet
 
 // https://docs.anthropic.com/claude/docs/models-overview
 const (
-	// Claude 3 models
-	Claude35Sonnet Model = "claude-3-5-sonnet-20240620"
-	Claude3Opus    Model = "claude-3-opus-20240229"
-	Claude3Sonnet  Model = "claude-3-sonnet-20240229"
-	Claude3Haiku   Model = "claude-3-haiku-20240307"
+	// Highest level of intelligence and capability
+	Claude35Sonnet Model = "claude-3-5-sonnet-latest"
+
+	// New version of claude-3-5-sonnet
+	Claude35Sonnet_20241022 Model = "claude-3-5-sonnet-20241022"
+
+	// Former highest level of intelligence and capability
+	Claude35Sonnet_20240620 Model = "claude-3-5-sonnet-20240620"
 
 	// Claude 2 models
 	ClaudeV2_1 Model = "claude-2.1"
@@ -32,14 +35,22 @@ const (
 	ClaudeInstantV1_1      Model = "claude-instant-v1.1"
 	ClaudeInstantV1_1_100k Model = "claude-instant-v1.1-100k"
 	ClaudeInstantV1_0      Model = "claude-instant-v1.0"
+
+	// First, add the missing Claude 3 model constants
+	Claude3Opus   Model = "claude-3-opus-20240229"
+	Claude3Sonnet Model = "claude-3-sonnet-20240229"
+	Claude3Haiku  Model = "claude-3-haiku-20240307"
 )
 
+// Define the imageCompatibleModels map alongside the other maps
 var (
 	imageCompatibleModels = map[Model]bool{
-		Claude35Sonnet: true,
-		Claude3Opus:    true,
-		Claude3Sonnet:  true,
-		Claude3Haiku:   true,
+		Claude3Opus:             true,
+		Claude3Sonnet:           true,
+		Claude3Haiku:            true,
+		Claude35Sonnet:          true,
+		Claude35Sonnet_20241022: true,
+		Claude35Sonnet_20240620: true,
 	}
 
 	messageCompatibleModels = map[Model]bool{
@@ -69,29 +80,18 @@ var (
 		ClaudeInstantV1_1_100k: true,
 		ClaudeInstantV1_0:      true,
 	}
-
-	validModels = make(map[Model]bool)
 )
-
-func init() {
-	// Populate validModels map
-	for model := range imageCompatibleModels {
-		validModels[model] = true
-	}
-	for model := range messageCompatibleModels {
-		validModels[model] = true
-	}
-	for model := range completeCompatibleModels {
-		validModels[model] = true
-	}
-}
 
 func (m Model) IsImageCompatible() bool {
 	return imageCompatibleModels[m]
 }
 
 func (m Model) IsMessageCompatible() bool {
-	return messageCompatibleModels[m]
+	switch m {
+	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620:
+		return true
+	}
+	return false
 }
 
 func (m Model) IsCompleteCompatible() bool {
@@ -99,5 +99,5 @@ func (m Model) IsCompleteCompatible() bool {
 }
 
 func (m Model) IsValid() bool {
-	return validModels[m]
+	return imageCompatibleModels[m] || messageCompatibleModels[m] || completeCompatibleModels[m]
 }
