@@ -5,14 +5,20 @@ type Model string
 
 // https://docs.anthropic.com/claude/docs/models-overview
 const (
-		// Highest level of intelligence and capability
+	// Highest level of intelligence and capability
 	Claude35Sonnet Model = "claude-3-5-sonnet-latest"
-  
-  // New version of claude-3-5-sonnet
+
+	// New version of claude-3-5-sonnet
 	Claude35Sonnet_20241022 Model = "claude-3-5-sonnet-20241022"
 
 	// Former highest level of intelligence and capability
 	Claude35Sonnet_20240620 Model = "claude-3-5-sonnet-20240620"
+
+	// Fastest and most compact model for near-instant responsiveness
+	Claude35Haiku Model = "claude-3-5-haiku-latest"
+
+	// Fastest and most compact model for near-instant responsiveness, 20241022 model
+	Claude35Haiku_20241022 Model = "claude-3-5-haiku-20241022"
 
 	// Most powerful model for highly complex tasks.
 	Claude3Opus Model = "claude-3-opus-20240229"
@@ -80,7 +86,7 @@ func (m Model) IsImageCompatible() bool {
 
 func (m Model) IsMessageCompatible() bool {
 	switch m {
-	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620:
+	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620, Claude35Haiku, Claude35Haiku_20241022:
 		return true
 	}
 	return false

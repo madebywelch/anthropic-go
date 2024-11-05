@@ -17,8 +17,10 @@ const (
 	AnthropicVersion = "bedrock-2023-05-31"
 
 	BedrockModelClaude35Sonnet          = "anthropic.claude-3-5-sonnet-20241022-v2:0"
-  BedrockModelClaude35Sonnet_20241022 = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+	BedrockModelClaude35Sonnet_20241022 = "anthropic.claude-3-5-sonnet-20241022-v2:0"
 	BedrockModelClaude35Sonnet_20240620 = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+	BedrockModelClaude35Haiku           = "anthropic.claude-3-5-haiku-20241022-v1:0"
+	BedrockModelClaude35Haiku_20241022  = "anthropic.claude-3-5-haiku-20241022-v1:0"
 	BedrockModelClaude3Opus             = "anthropic.claude-3-opus-20240229-v1:0"
 	BedrockModelClaude3Sonnet           = "anthropic.claude-3-sonnet-20240229-v1:0"
 	BedrockModelClaude3Haiku            = "anthropic.claude-3-haiku-20240307-v1:0"
@@ -93,10 +95,14 @@ func (c *Client) adaptModelForMessage(model anthropic.Model) (string, error) {
 	switch model {
 	case anthropic.Claude35Sonnet:
 		adaptedModel = BedrockModelClaude35Sonnet
-  case anthropic.Claude35Sonnet_20241022:
+	case anthropic.Claude35Sonnet_20241022:
 		adaptedModel = BedrockModelClaude35Sonnet_20241022
 	case anthropic.Claude35Sonnet_20240620:
 		adaptedModel = BedrockModelClaude35Sonnet_20240620
+	case anthropic.Claude35Haiku:
+		adaptedModel = BedrockModelClaude35Haiku
+	case anthropic.Claude35Haiku_20241022:
+		adaptedModel = BedrockModelClaude35Haiku_20241022
 	case anthropic.Claude3Opus:
 		adaptedModel = BedrockModelClaude3Opus
 	case anthropic.Claude3Sonnet:
