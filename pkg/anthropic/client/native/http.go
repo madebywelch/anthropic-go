@@ -2,6 +2,7 @@
 package native
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
@@ -22,7 +23,9 @@ func (c *Client) doRequest(request *http.Request) (*http.Response, error) {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		err = anthropic.MapHTTPStatusCodeToError(response.StatusCode)
+		defer response.Body.Close()
+		body, _ := io.ReadAll(response.Body)
+		err = anthropic.MapHTTPStatusCodeToError(response.StatusCode, string(body))
 		return nil, err
 	}
 

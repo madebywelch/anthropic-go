@@ -62,7 +62,7 @@ func (c *Client) handleMessageStreaming(
 	)
 	if err != nil {
 		errStatusCode := extractErrStatusCode(err)
-		errCh <- anthropic.MapHTTPStatusCodeToError(errStatusCode)
+		errCh <- anthropic.MapHTTPStatusCodeToError(errStatusCode, err.Error())
 		return
 	}
 
