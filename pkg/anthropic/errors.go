@@ -2,8 +2,27 @@ package anthropic
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 )
+
+type AnthropicErr struct {
+	err         error
+	errResponse string
+}
+
+func (e *AnthropicErr) Error() string {
+	return fmt.Sprintf("%s", e.err)
+}
+
+func (e *AnthropicErr) Unwrap() error {
+	return e.err
+}
+
+// ErrResponse is the upstream anthropic error response
+func (e *AnthropicErr) ErrResponse() string {
+	return e.errResponse
+}
 
 var (
 	ErrAnthropicInvalidRequest = errors.New("invalid request: there was an issue with the format or content of your request")
@@ -11,24 +30,49 @@ var (
 	ErrAnthropicForbidden      = errors.New("forbidden: your API key does not have permission to use the specified resource")
 	ErrAnthropicRateLimit      = errors.New("your account has hit a rate limit")
 	ErrAnthropicInternalServer = errors.New("an unexpected error has occurred internal to Anthropic's systems")
-
 	ErrAnthropicApiKeyRequired = errors.New("apiKey is required")
+	ErrAnthropicUnknown        = errors.New("unknown error occurred")
 )
 
+func NewAnthropicErr(err error, errResponse string) *AnthropicErr {
+	return &AnthropicErr{
+		err:         err,
+		errResponse: errResponse,
+	}
+}
+
 // mapHTTPStatusCodeToError maps an HTTP status code to an error.
-func MapHTTPStatusCodeToError(code int) error {
+func MapHTTPStatusCodeToError(code int, errResponse string) error {
 	switch code {
 	case http.StatusBadRequest:
-		return ErrAnthropicInvalidRequest
+		return &AnthropicErr{
+			err:         ErrAnthropicInvalidRequest,
+			errResponse: errResponse,
+		}
 	case http.StatusUnauthorized:
-		return ErrAnthropicUnauthorized
+		return &AnthropicErr{
+			err:         ErrAnthropicUnauthorized,
+			errResponse: errResponse,
+		}
 	case http.StatusForbidden:
-		return ErrAnthropicForbidden
+		return &AnthropicErr{
+			err:         ErrAnthropicForbidden,
+			errResponse: errResponse,
+		}
 	case http.StatusTooManyRequests:
-		return ErrAnthropicRateLimit
+		return &AnthropicErr{
+			err:         ErrAnthropicRateLimit,
+			errResponse: errResponse,
+		}
 	case http.StatusInternalServerError:
-		return ErrAnthropicInternalServer
+		return &AnthropicErr{
+			err:         ErrAnthropicInternalServer,
+			errResponse: errResponse,
+		}
 	default:
-		return errors.New("unknown error occurred")
+		return &AnthropicErr{
+			err:         ErrAnthropicUnknown,
+			errResponse: errResponse,
+		}
 	}
 }

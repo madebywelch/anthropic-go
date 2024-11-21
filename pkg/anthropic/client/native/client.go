@@ -24,7 +24,7 @@ type Config struct {
 
 func MakeClient(cfg Config) (*Client, error) {
 	if cfg.APIKey == "" {
-		return nil, anthropic.ErrAnthropicApiKeyRequired
+		return nil, anthropic.NewAnthropicErr(anthropic.ErrAnthropicApiKeyRequired, "")
 	}
 
 	if cfg.BaseURL == "" {
