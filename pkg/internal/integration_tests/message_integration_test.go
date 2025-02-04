@@ -15,6 +15,10 @@ type WeatherRequest struct {
 	Unit string `json:"unit" jsonschema:"enum=celsius,enum=fahrenheit,description=temperature unit to return"`
 }
 
+type StockPriceRequest struct {
+	Ticker string `json:"ticker" jsonschema:"required,description=The stock ticker symbol, e.g. AAPL for Apple Inc."`
+}
+
 func TestMessageWithToolsIntegration(t *testing.T) {
 	apiKey := os.Getenv("ANTHROPIC_API_KEY")
 	if apiKey == "" {
@@ -23,6 +27,7 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 
 	anthropicClient, err := native.MakeClient(native.Config{
 		APIKey: apiKey,
+		Beta:   "computer-use-2024-10-22",
 	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -36,16 +41,25 @@ func TestMessageWithToolsIntegration(t *testing.T) {
 		},
 		Tools: []anthropic.Tool{
 			{
-				Name:        "get_weather",
-				Description: "Get the weather",
-				InputSchema: anthropic.GenerateInputSchema(&WeatherRequest{}),
+				Name:        "get_stock_price",
+				Description: "Get the current stock price for a given ticker symbol.",
+				InputSchema: anthropic.InputSchema{
+					Type: "object",
+					Properties: map[string]anthropic.InputSchemaProperty{
+						"ticker": {
+							Type:        "string",
+							Description: "The stock ticker symbol, e.g. AAPL for Apple Inc.",
+						},
+					},
+					Required: []string{"ticker"},
+				},
 			},
 		},
 		Messages: []anthropic.MessagePartRequest{
 			{
 				Role: "user",
 				Content: []anthropic.ContentBlock{
-					anthropic.NewTextContentBlock("what's the weather in Charleston?"),
+					anthropic.NewTextContentBlock("what's the stock price for AAPL?"),
 				},
 			},
 		},
@@ -69,6 +83,7 @@ func TestMessageWithForcedToolIntegration(t *testing.T) {
 
 	anthropicClient, err := native.MakeClient(native.Config{
 		APIKey: apiKey,
+		Beta:   "computer-use-2024-10-22",
 	})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -85,7 +100,19 @@ func TestMessageWithForcedToolIntegration(t *testing.T) {
 			{
 				Name:        "get_weather",
 				Description: "Get the weather",
-				InputSchema: anthropic.GenerateInputSchema(&WeatherRequest{}),
+				InputSchema: anthropic.InputSchema{
+					Type: "object",
+					Properties: map[string]anthropic.InputSchemaProperty{
+						"city": {
+							Type:        "string",
+							Description: "City to get the weather for",
+						},
+						"unit": {
+							Type:        "string",
+							Description: "Temperature unit to return",
+						},
+					},
+				},
 			},
 		},
 		Messages: []anthropic.MessagePartRequest{

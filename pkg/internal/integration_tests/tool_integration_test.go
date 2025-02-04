@@ -57,7 +57,20 @@ func createWeatherRequest() *anthropic.MessageRequest {
 			{
 				Name:        "get_weather",
 				Description: "Get the current weather in a given location",
-				InputSchema: anthropic.GenerateInputSchema(&WeatherRequest{}),
+				InputSchema: anthropic.InputSchema{
+					Type: "object",
+					Properties: map[string]anthropic.InputSchemaProperty{
+						"city": {
+							Type:        "string",
+							Description: "city to get the weather for",
+						},
+						"unit": {
+							Type:        "string",
+							Description: "temperature unit to return",
+						},
+					},
+					Required: []string{"city", "unit"},
+				},
 			},
 		},
 		Messages: []anthropic.MessagePartRequest{

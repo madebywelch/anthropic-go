@@ -17,7 +17,7 @@ const (
 	AnthropicVersion = "bedrock-2023-05-31"
 
 	BedrockModelClaude35Sonnet          = "anthropic.claude-3-5-sonnet-20241022-v2:0"
-  BedrockModelClaude35Sonnet_20241022 = "anthropic.claude-3-5-sonnet-20241022-v2:0"
+	BedrockModelClaude35Sonnet_20241022 = "anthropic.claude-3-5-sonnet-20241022-v2:0"
 	BedrockModelClaude35Sonnet_20240620 = "anthropic.claude-3-5-sonnet-20240620-v1:0"
 	BedrockModelClaude3Opus             = "anthropic.claude-3-opus-20240229-v1:0"
 	BedrockModelClaude3Sonnet           = "anthropic.claude-3-sonnet-20240229-v1:0"
@@ -44,7 +44,7 @@ type Config struct {
 
 func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
 	if cfg.Region == "" {
-		return nil, fmt.Errorf("Region is requried for establishing anthropic bedrock client")
+		return nil, fmt.Errorf("region is requried for establishing anthropic bedrock client")
 	}
 
 	awsCfg, err := config.LoadDefaultConfig(
@@ -72,7 +72,7 @@ func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
 		regionPrefix = cfg.Region[:2]
 		if regionPrefix != CRUS && regionPrefix != CREU {
 			return nil, fmt.Errorf(
-				"Cross region inference is only supported for: '%s', '%s'; Region prefix: '%s' is not supported",
+				"cross region inference is only supported for: '%s', '%s'; Region prefix: '%s' is not supported",
 				CRUS,
 				CREU,
 				regionPrefix,
@@ -93,7 +93,7 @@ func (c *Client) adaptModelForMessage(model anthropic.Model) (string, error) {
 	switch model {
 	case anthropic.Claude35Sonnet:
 		adaptedModel = BedrockModelClaude35Sonnet
-  case anthropic.Claude35Sonnet_20241022:
+	case anthropic.Claude35Sonnet_20241022:
 		adaptedModel = BedrockModelClaude35Sonnet_20241022
 	case anthropic.Claude35Sonnet_20240620:
 		adaptedModel = BedrockModelClaude35Sonnet_20240620
@@ -114,19 +114,10 @@ func (c *Client) adaptModelForMessage(model anthropic.Model) (string, error) {
 	}
 
 	if adaptedModel == BedrockModelClaudeV2_1 {
-		return "", fmt.Errorf("Bedrock model %s is not compatible with cross-region inference", adaptedModel)
+		return "", fmt.Errorf("bedrock model %s is not compatible with cross-region inference", adaptedModel)
 	}
 
 	return fmt.Sprintf("%s.%s", c.crInferenceRegion, adaptedModel), nil
-}
-
-// adaptModelForCompletion takes the model as defined in anthropic.Model and adapts it to the model Bedrock expects
-func adaptModelForCompletion(model anthropic.Model) (string, error) {
-	if model == anthropic.ClaudeV2_1 {
-		return BedrockModelClaudeV2_1, nil
-	}
-
-	return "", fmt.Errorf("model %s is not compatible with the bedrock completion endpoint", model)
 }
 
 // MessageRequest is an override for the default message request to adapt the request for the Bedrock API.
@@ -141,20 +132,6 @@ func adaptMessageRequest(req *anthropic.MessageRequest) *MessageRequest {
 	return &MessageRequest{
 		MessageRequest:   *req,
 		AnthropicVersion: AnthropicVersion,
-	}
-}
-
-type CompleteRequest struct {
-	anthropic.CompletionRequest
-	AnthropicVersion string `json:"anthropic_version"`
-	Model            bool   `json:"model,omitempty"`  // shadow for Model
-	Stream           bool   `json:"stream,omitempty"` // shadow for Stream
-}
-
-func adaptCompletionRequest(req *anthropic.CompletionRequest) *CompleteRequest {
-	return &CompleteRequest{
-		CompletionRequest: *req,
-		AnthropicVersion:  AnthropicVersion,
 	}
 }
 

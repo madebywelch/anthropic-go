@@ -1,56 +1,7 @@
 package anthropic
 
-// CompletionRequestOption is a function type for CompletionRequest options
-type CompletionRequestOption func(*CompletionRequest)
-
 // MessageRequestOption is a function type for MessageRequest options
 type MessageRequestOption func(*MessageRequest)
-
-// Completion Request Options
-
-func WithCompletionModel(model Model) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.Model = model
-	}
-}
-
-func WithCompletionMaxTokens(maxTokens int) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.MaxTokensToSample = maxTokens
-	}
-}
-
-func WithCompletionStream(stream bool) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.Stream = stream
-	}
-}
-
-func WithCompletionStopSequences(stopSequences []string) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.StopSequences = stopSequences
-	}
-}
-
-func WithCompletionTemperature(temperature float64) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.Temperature = temperature
-	}
-}
-
-func WithCompletionTopK(topK int) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.TopK = topK
-	}
-}
-
-func WithCompletionTopP(topP float64) CompletionRequestOption {
-	return func(r *CompletionRequest) {
-		r.TopP = topP
-	}
-}
-
-// Message Request Options
 
 func WithMessageModel(model Model) MessageRequestOption {
 	return func(r *MessageRequest) {

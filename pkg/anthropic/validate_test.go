@@ -10,11 +10,6 @@ type validateMessageTestCase struct {
 	expErr  string
 }
 
-type validateCompleteTestCase struct {
-	request *CompletionRequest
-	expErr  string
-}
-
 func TestValidateMessageRequest(t *testing.T) {
 	requests := []validateMessageTestCase{
 		{
@@ -127,72 +122,6 @@ func TestValidateMessageStreamRequest(t *testing.T) {
 
 	for _, test := range requests {
 		err := ValidateMessageStreamRequest(test.request)
-		if err == nil && test.expErr != "" {
-			t.Errorf("Expected error %s, got nil", test.expErr)
-		}
-
-		if err == nil {
-			continue
-		}
-
-		if err.Error() != test.expErr {
-			t.Errorf("Expected error %s, got %s", test.expErr, err.Error())
-		}
-	}
-}
-
-func TestValidateCompleteRequest(t *testing.T) {
-	requests := []validateCompleteTestCase{
-		{
-			request: &CompletionRequest{
-				Stream: true,
-			},
-			expErr: "cannot use Complete with streaming enabled, use CompleteStream instead",
-		},
-		{
-			request: &CompletionRequest{
-				Stream: false,
-				Model:  Model("not-a-valid-model"),
-			},
-			expErr: "model not-a-valid-model is not compatible with the completion endpoint",
-		},
-	}
-
-	for _, test := range requests {
-		err := ValidateCompleteRequest(test.request)
-		if err == nil && test.expErr != "" {
-			t.Errorf("Expected error %s, got nil", test.expErr)
-		}
-
-		if err == nil {
-			continue
-		}
-
-		if err.Error() != test.expErr {
-			t.Errorf("Expected error %s, got %s", test.expErr, err.Error())
-		}
-	}
-}
-
-func TestValidateCompleteStreamRequest(t *testing.T) {
-	requests := []validateCompleteTestCase{
-		{
-			request: &CompletionRequest{
-				Stream: false,
-			},
-			expErr: "cannot use CompleteStream with streaming disabled, use Complete instead",
-		},
-		{
-			request: &CompletionRequest{
-				Stream: true,
-				Model:  Model("not-a-valid-model"),
-			},
-			expErr: "model not-a-valid-model is not compatible with the completion endpoint",
-		},
-	}
-
-	for _, test := range requests {
-		err := ValidateCompleteStreamRequest(test.request)
 		if err == nil && test.expErr != "" {
 			t.Errorf("Expected error %s, got nil", test.expErr)
 		}
