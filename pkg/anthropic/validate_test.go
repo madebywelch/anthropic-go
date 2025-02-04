@@ -47,7 +47,7 @@ func TestValidateMessageRequest(t *testing.T) {
 					Content: getTwentyOneImgs(),
 				}},
 			},
-			expErr: fmt.Sprintf("too many image content blocks, maximum is 20"),
+			expErr: fmt.Sprintln("too many image content blocks, maximum is 20"),
 		},
 	}
 
@@ -116,7 +116,7 @@ func TestValidateMessageStreamRequest(t *testing.T) {
 					Content: getTwentyOneImgs(),
 				}},
 			},
-			expErr: fmt.Sprintf("too many image content blocks, maximum is 20"),
+			expErr: fmt.Sprintln("too many image content blocks, maximum is 20"),
 		},
 	}
 

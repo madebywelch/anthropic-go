@@ -17,7 +17,13 @@ const (
 	// Former highest level of intelligence and capability
 	Claude35Sonnet_20240620 Model = "claude-3-5-sonnet-20240620"
 
-	// Claude 2 models
+	// Fastest and most compact model for near-instant responsiveness
+	Claude35Haiku Model = "claude-3-5-haiku-latest"
+
+	// Fastest and most compact model for near-instant responsiveness, 20241022 model
+	Claude35Haiku_20241022 Model = "claude-3-5-haiku-20241022"
+
+	// Updated version of Claude 2 with improved accuracy
 	ClaudeV2_1 Model = "claude-2.1"
 	ClaudeV2   Model = "claude-2"
 
@@ -89,7 +95,11 @@ func (m Model) IsImageCompatible() bool {
 }
 
 func (m Model) IsMessageCompatible() bool {
-	return messageCompatibleModels[m]
+	switch m {
+	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620, Claude35Haiku, Claude35Haiku_20241022:
+		return true
+	}
+	return false
 }
 
 func (m Model) IsCompleteCompatible() bool {
