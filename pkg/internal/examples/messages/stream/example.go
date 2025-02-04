@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic/client/native"
 )
 
 func main() {
@@ -27,10 +27,10 @@ func main() {
 	}
 
 	request := anthropic.NewMessageRequest(
-		messages,
-		anthropic.WithModel[anthropic.MessageRequest](anthropic.Claude3Opus),
-		anthropic.WithMaxTokens[anthropic.MessageRequest](1000),
-		anthropic.WithStream[anthropic.MessageRequest](true),
+		anthropic.WithMessageModel(anthropic.Claude3Opus),
+		anthropic.WithMessageMaxTokens(1000),
+		anthropic.WithMessageStream(true),
+		anthropic.WithMessages(messages),
 	)
 
 	rCh, errCh := client.MessageStream(ctx, request)

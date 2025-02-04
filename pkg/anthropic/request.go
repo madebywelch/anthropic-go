@@ -1,37 +1,5 @@
 package anthropic
 
-import "github.com/invopop/jsonschema"
-
-// CompletionRequest is the request to the Anthropic API for a completion.
-type CompletionRequest struct {
-	Prompt            string   `json:"prompt"`
-	Model             Model    `json:"model,omitempty"`
-	MaxTokensToSample int      `json:"max_tokens_to_sample"`
-	StopSequences     []string `json:"stop_sequences,omitempty"` // optional
-	Stream            bool     `json:"stream,omitempty"`         // optional
-	Temperature       float64  `json:"temperature,omitempty"`    // optional
-	TopK              int      `json:"top_k,omitempty"`          // optional
-	TopP              float64  `json:"top_p,omitempty"`          // optional
-}
-
-// NewCompletionRequest creates a new CompletionRequest with the given prompt and options.
-//
-// prompt: the prompt for the completion request.
-// options: optional GenericOptions to customize the completion request.
-// Returns a pointer to the newly created CompletionRequest.
-func NewCompletionRequest(prompt string, options ...GenericOption[CompletionRequest]) *CompletionRequest {
-	request := &CompletionRequest{
-		Prompt: prompt,
-		// defauts, can be overridden
-		Model:             ClaudeV2,
-		MaxTokensToSample: 25,
-	}
-	for _, option := range options {
-		option(request)
-	}
-	return request
-}
-
 // ContentBlock interface to allow for both TextContentBlock and ImageContentBlock
 type ContentBlock interface {
 	// This method exists solely to enforce compile-time checking of the types that implement this interface.
@@ -159,14 +127,39 @@ type MessageRequest struct {
 	TopP              float64              `json:"top_p,omitempty"`          // optional
 }
 
-type Tool struct {
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	InputSchema *jsonschema.Schema `json:"input_schema"`
+type InputSchemaProperty struct {
+	Type        string `json:"type"`
+	Description string `json:"description"`
 }
 
-func GenerateInputSchema(input interface{}) *jsonschema.Schema {
-	return (&jsonschema.Reflector{ExpandedStruct: true}).Reflect(input)
+type InputSchema struct {
+	Type       string                         `json:"type"`
+	Properties map[string]InputSchemaProperty `json:"properties"`
+	Required   []string                       `json:"required,omitempty"`
+}
+
+type Tool struct {
+	Name            string      `json:"name"`
+	Description     string      `json:"description,omitempty"`
+	InputSchema     InputSchema `json:"input_schema,omitempty"`
+	DisplayWidthPx  int         `json:"display_width_px,omitempty"`
+	DisplayHeightPx int         `json:"display_height_px,omitempty"`
+	DisplayNumber   int         `json:"display_number,omitempty"`
+}
+
+const (
+	ToolTypeComputer   = "computer_20241022"
+	ToolTypeTextEditor = "text_editor_20241022"
+	ToolTypeBash       = "bash_20241022"
+)
+
+// Update helper functions to match the correct schema
+func NewComputerTool(width, height, displayNum int) Tool {
+	return Tool{
+		DisplayWidthPx:  width,
+		DisplayHeightPx: height,
+		DisplayNumber:   displayNum,
+	}
 }
 
 // CountImageContent counts the number of ImageContentBlock in the MessageRequest.
@@ -200,12 +193,9 @@ func (m *MessageRequest) ContainsImageContent() bool {
 	return false
 }
 
-// NewMessageRequest creates a new MessageRequest with the provided messages and options.
-// It takes in a slice of MessagePartRequests and optional GenericOptions and returns a pointer to a MessageRequest.
-func NewMessageRequest(messages []MessagePartRequest, options ...GenericOption[MessageRequest]) *MessageRequest {
+// NewMessageRequest creates a new MessageRequest with the provided options.
+func NewMessageRequest(options ...MessageRequestOption) *MessageRequest {
 	request := &MessageRequest{
-		Messages: messages,
-		// defauts, can be overridden
 		Model:             ClaudeV2,
 		MaxTokensToSample: 25,
 	}
@@ -213,4 +203,23 @@ func NewMessageRequest(messages []MessagePartRequest, options ...GenericOption[M
 		option(request)
 	}
 	return request
+}
+
+// AddMessage adds a message to the MessageRequest.
+func (r *MessageRequest) AddMessage(role string, content ...ContentBlock) *MessageRequest {
+	r.Messages = append(r.Messages, MessagePartRequest{
+		Role:    role,
+		Content: content,
+	})
+	return r
+}
+
+// AddUserMessage adds a user message to the MessageRequest.
+func (r *MessageRequest) AddUserMessage(content ...ContentBlock) *MessageRequest {
+	return r.AddMessage("user", content...)
+}
+
+// AddAssistantMessage adds an assistant message to the MessageRequest.
+func (r *MessageRequest) AddAssistantMessage(content ...ContentBlock) *MessageRequest {
+	return r.AddMessage("assistant", content...)
 }

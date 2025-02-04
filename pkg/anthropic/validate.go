@@ -41,27 +41,3 @@ func ValidateMessageStreamRequest(req *MessageRequest) error {
 
 	return nil
 }
-
-func ValidateCompleteRequest(req *CompletionRequest) error {
-	if req.Stream {
-		return fmt.Errorf("cannot use Complete with streaming enabled, use CompleteStream instead")
-	}
-
-	if !req.Model.IsCompleteCompatible() {
-		return fmt.Errorf("model %s is not compatible with the completion endpoint", req.Model)
-	}
-
-	return nil
-}
-
-func ValidateCompleteStreamRequest(req *CompletionRequest) error {
-	if !req.Stream {
-		return fmt.Errorf("cannot use CompleteStream with streaming disabled, use Complete instead")
-	}
-
-	if !req.Model.IsCompleteCompatible() {
-		return fmt.Errorf("model %s is not compatible with the completion endpoint", req.Model)
-	}
-
-	return nil
-}

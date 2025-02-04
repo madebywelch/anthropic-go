@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -46,7 +46,7 @@ type Config struct {
 
 func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
 	if cfg.Region == "" {
-		return nil, fmt.Errorf("Region is requried for establishing anthropic bedrock client")
+		return nil, fmt.Errorf("region is requried for establishing anthropic bedrock client")
 	}
 
 	awsCfg, err := config.LoadDefaultConfig(
@@ -74,7 +74,7 @@ func MakeClient(ctx context.Context, cfg Config) (*Client, error) {
 		regionPrefix = cfg.Region[:2]
 		if regionPrefix != CRUS && regionPrefix != CREU {
 			return nil, fmt.Errorf(
-				"Cross region inference is only supported for: '%s', '%s'; Region prefix: '%s' is not supported",
+				"cross region inference is only supported for: '%s', '%s'; Region prefix: '%s' is not supported",
 				CRUS,
 				CREU,
 				regionPrefix,
@@ -120,19 +120,10 @@ func (c *Client) adaptModelForMessage(model anthropic.Model) (string, error) {
 	}
 
 	if adaptedModel == BedrockModelClaudeV2_1 {
-		return "", fmt.Errorf("Bedrock model %s is not compatible with cross-region inference", adaptedModel)
+		return "", fmt.Errorf("bedrock model %s is not compatible with cross-region inference", adaptedModel)
 	}
 
 	return fmt.Sprintf("%s.%s", c.crInferenceRegion, adaptedModel), nil
-}
-
-// adaptModelForCompletion takes the model as defined in anthropic.Model and adapts it to the model Bedrock expects
-func adaptModelForCompletion(model anthropic.Model) (string, error) {
-	if model == anthropic.ClaudeV2_1 {
-		return BedrockModelClaudeV2_1, nil
-	}
-
-	return "", fmt.Errorf("model %s is not compatible with the bedrock completion endpoint", model)
 }
 
 // MessageRequest is an override for the default message request to adapt the request for the Bedrock API.
@@ -147,20 +138,6 @@ func adaptMessageRequest(req *anthropic.MessageRequest) *MessageRequest {
 	return &MessageRequest{
 		MessageRequest:   *req,
 		AnthropicVersion: AnthropicVersion,
-	}
-}
-
-type CompleteRequest struct {
-	anthropic.CompletionRequest
-	AnthropicVersion string `json:"anthropic_version"`
-	Model            bool   `json:"model,omitempty"`  // shadow for Model
-	Stream           bool   `json:"stream,omitempty"` // shadow for Stream
-}
-
-func adaptCompletionRequest(req *anthropic.CompletionRequest) *CompleteRequest {
-	return &CompleteRequest{
-		CompletionRequest: *req,
-		AnthropicVersion:  AnthropicVersion,
 	}
 }
 

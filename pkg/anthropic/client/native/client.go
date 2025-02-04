@@ -3,7 +3,7 @@ package native
 import (
 	"net/http"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic"
 )
 
 type Client struct {
@@ -11,13 +11,14 @@ type Client struct {
 	apiKey     string
 	baseURL    string
 	beta       string
+	cache      string
 }
 
 type Config struct {
 	APIKey  string
 	BaseURL string
 	Beta    string
-
+	Cache   string
 	// Optional (defaults to http.DefaultClient)
 	HTTPClient *http.Client
 }
@@ -40,5 +41,6 @@ func MakeClient(cfg Config) (*Client, error) {
 		apiKey:     cfg.APIKey,
 		baseURL:    cfg.BaseURL,
 		beta:       cfg.Beta,
+		cache:      cfg.Cache,
 	}, nil
 }

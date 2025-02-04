@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/madebywelch/anthropic-go/v4/pkg/anthropic"
 )
 
 func (c *Client) Message(ctx context.Context, req *anthropic.MessageRequest) (*anthropic.MessageResponse, error) {
@@ -23,13 +23,13 @@ func (c *Client) sendMessageRequest(
 	ctx context.Context,
 	req *anthropic.MessageRequest,
 ) (*anthropic.MessageResponse, error) {
-	// Marshal the request to JSON
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling message request: %w", err)
 	}
 
-	// Create the HTTP request
+	fmt.Printf("Sending payload %v", bytes.NewBuffer((data)))
+
 	requestURL := fmt.Sprintf("%s/v1/messages", c.baseURL)
 	request, err := http.NewRequestWithContext(ctx, "POST", requestURL, bytes.NewBuffer(data))
 	if err != nil {
