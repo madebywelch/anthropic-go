@@ -5,6 +5,10 @@ type Model string
 
 // https://docs.anthropic.com/claude/docs/models-overview
 const (
+	Claude37Sonnet Model = "claude-3-7-sonnet-latest"
+
+	Claude37Sonnet_20250219 Model = "claude-3-7-sonnet-20250219"
+
 	// Highest level of intelligence and capability
 	Claude35Sonnet Model = "claude-3-5-sonnet-latest"
 
@@ -86,7 +90,7 @@ func (m Model) IsImageCompatible() bool {
 
 func (m Model) IsMessageCompatible() bool {
 	switch m {
-	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620, Claude35Haiku, Claude35Haiku_20241022:
+	case Claude3Opus, Claude3Sonnet, Claude3Haiku, ClaudeV2_1, Claude35Sonnet, Claude35Sonnet_20241022, Claude35Sonnet_20240620, Claude35Haiku, Claude35Haiku_20241022, Claude37Sonnet, Claude37Sonnet_20250219:
 		return true
 	}
 	return false
