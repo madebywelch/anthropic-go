@@ -5,6 +5,10 @@ type Model string
 
 // https://docs.anthropic.com/claude/docs/models-overview
 const (
+	Claude37Sonnet Model = "claude-3-7-sonnet-latest"
+
+	Claude37Sonnet_20250219 Model = "claude-3-7-sonnet-20250219"
+
 	// Highest level of intelligence and capability
 	Claude35Sonnet Model = "claude-3-5-sonnet-latest"
 
