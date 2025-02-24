@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func main() {

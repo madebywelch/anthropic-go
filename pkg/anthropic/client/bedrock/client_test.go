@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 )
 
 func Test_Client_Success_RegionOnly(t *testing.T) {
