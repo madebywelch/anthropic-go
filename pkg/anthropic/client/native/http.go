@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 )
 
 const (

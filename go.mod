@@ -1,4 +1,4 @@
-module github.com/madebywelch/anthropic-go/v3
+module github.com/pigeonlaser/anthropic-go/v3
 
 go 1.20
 

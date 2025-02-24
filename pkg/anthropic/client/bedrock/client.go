@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"

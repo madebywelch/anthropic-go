@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 )
 
 func TestMessage(t *testing.T) {
