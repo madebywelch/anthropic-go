@@ -149,6 +149,7 @@ type MessageRequest struct {
 	Tools             []Tool               `json:"tools,omitempty"`
 	Messages          []MessagePartRequest `json:"messages"`
 	MaxTokensToSample int                  `json:"max_tokens"`
+	Thinking          *Thinking            `json:"thinking,omitempty"`       // optional
 	SystemPrompt      string               `json:"system,omitempty"`         // optional
 	Metadata          interface{}          `json:"metadata,omitempty"`       // optional
 	StopSequences     []string             `json:"stop_sequences,omitempty"` // optional
@@ -157,7 +158,6 @@ type MessageRequest struct {
 	ToolChoice        *ToolChoice          `json:"tool_choice,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
-	Thinking          Thinking             `json:"thinking,omitempty"`       // optional
 }
 
 type Thinking struct {

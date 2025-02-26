@@ -130,11 +130,11 @@ func WithThinking[T any](budgetTokens int) GenericOption[T] {
 		switch v := any(r).(type) {
 		case *MessageRequest:
 			if budgetTokens <= 0 {
-				v.Thinking = Thinking{
+				v.Thinking = &Thinking{
 					Type: "disabled",
 				}
 			} else {
-				v.Thinking = Thinking{
+				v.Thinking = &Thinking{
 					Type:         "enabled",
 					BudgetTokens: budgetTokens,
 				}
