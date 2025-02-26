@@ -2,14 +2,14 @@
 
 This project provides an unofficial Go SDK for Anthropic, a next-generation AI assistant platform. The SDK simplifies interactions with the Anthropic API in Go applications. For more information about Anthropic and its API, visit the [official Anthropic documentation](https://console.anthropic.com/docs).
 
-[![GoDoc](https://godoc.org/github.com/madebywelch/anthropic-go?status.svg)](https://pkg.go.dev/github.com/madebywelch/anthropic-go/v3)
+[![GoDoc](https://godoc.org/github.com/pigeonlaser/anthropic-go?status.svg)](https://pkg.go.dev/github.com/pigeonlaser/anthropic-go/v3)
 
 ## Installation
 
 Install the Anthropic SDK for Go using:
 
 ```go
-go get github.com/madebywelch/anthropic-go/v3
+go get github.com/pigeonlaser/anthropic-go/v3
 ```
 
 ## Features
@@ -30,8 +30,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic/client/native"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic/client/native"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -98,7 +98,7 @@ func (c *Client) adaptModelForMessage(model anthropic.Model) (string, error) {
 	case anthropic.Claude37Sonnet:
 		adaptedModel = BedrockModelClaude37Sonnet
 	case anthropic.Claude37Sonnet_20250219:
-		adaptedModel = BedrockModelClaude37Sonnet
+		adaptedModel = BedrockModelClaude37Sonnet_20250219
 	case anthropic.Claude35Sonnet:
 		adaptedModel = BedrockModelClaude35Sonnet
 	case anthropic.Claude35Sonnet_20241022:

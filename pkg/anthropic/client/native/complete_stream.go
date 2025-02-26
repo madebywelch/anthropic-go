@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 )
 
 func (c *Client) CompleteStream(ctx context.Context, req *anthropic.CompletionRequest) (<-chan *anthropic.StreamResponse, <-chan error) {

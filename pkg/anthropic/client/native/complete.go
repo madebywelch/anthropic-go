@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/madebywelch/anthropic-go/v3/pkg/anthropic"
+	"github.com/pigeonlaser/anthropic-go/v3/pkg/anthropic"
 )
 
 func (c *Client) Complete(ctx context.Context, req *anthropic.CompletionRequest) (*anthropic.CompletionResponse, error) {
