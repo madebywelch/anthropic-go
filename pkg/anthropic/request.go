@@ -157,6 +157,12 @@ type MessageRequest struct {
 	ToolChoice        *ToolChoice          `json:"tool_choice,omitempty"`    // optional
 	TopK              int                  `json:"top_k,omitempty"`          // optional
 	TopP              float64              `json:"top_p,omitempty"`          // optional
+	Thinking          Thinking             `json:"thinking,omitempty"`       // optional
+}
+
+type Thinking struct {
+	Type         string `json:"type"`
+	BudgetTokens int    `json:"budget_tokens"`
 }
 
 type Tool struct {

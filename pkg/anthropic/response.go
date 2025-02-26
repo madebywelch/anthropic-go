@@ -22,9 +22,10 @@ type MessagePartResponse struct {
 	Text string `json:"text"`
 
 	// Optional fields, only present for tools responses
-	ID    string                 `json:"id,omitempty"`
-	Name  string                 `json:"name,omitempty"`
-	Input map[string]interface{} `json:"input,omitempty"`
+	ID       string                 `json:"id,omitempty"`
+	Name     string                 `json:"name,omitempty"`
+	Input    map[string]interface{} `json:"input,omitempty"`
+	Thinking string                 `json:"thinking,omitempty"`
 }
 
 // MessageResponse is the response from the Anthropic API for a message response.
@@ -56,6 +57,7 @@ type MessageStreamDelta struct {
 	Text         string `json:"text"`
 	StopReason   string `json:"stop_reason"`
 	StopSequence string `json:"stop_sequence"`
+	Thinking     string `json:"thinking"`
 }
 
 type MessageStreamUsage struct {

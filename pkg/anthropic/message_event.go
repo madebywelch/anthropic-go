@@ -43,8 +43,9 @@ type ContentBlockDeltaEvent struct {
 	MessageEvent
 	Index int `json:"index"`
 	Delta struct {
-		Type string `json:"type"`
-		Text string `json:"text"`
+		Type     string `json:"type"`
+		Text     string `json:"text"`
+		Thinking string `json:"thinking"`
 	} `json:"delta"`
 }
 
@@ -113,6 +114,7 @@ func ParseMessageEvent(eventType MessageEventType, event string) (*MessageStream
 		messageStreamResponse.Type = contentBlockEvent.Type
 		messageStreamResponse.Delta.Type = contentBlockEvent.Delta.Type
 		messageStreamResponse.Delta.Text = contentBlockEvent.Delta.Text
+		messageStreamResponse.Delta.Thinking = contentBlockEvent.Delta.Thinking
 	case MessageEventTypeContentBlockStop:
 		contentBlockStopEvent := &ContentBlockStopEvent{}
 		err = json.Unmarshal([]byte(event), &contentBlockStopEvent)
